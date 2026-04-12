@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"os/exec"
+	"strings"
 )
 
 func addAndCommit(message string) error {
@@ -53,12 +56,23 @@ func ForcePush(message, blame string) error {
 
 func ForcePull(skip bool) error {
 	if !skip {
-		var sure bool
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("This will wipe all unsaved changes. Are you sure? [y/N] ")
+		input, _ := reader.ReadString('\n')
+		sure := strings.TrimSpace(input)
 
-		fmt.Println("This will wipe all unsaved changes. Are you sure? [y/N]")
-		fmt.Scan(&sure)
+		if sure == "" {
+			sure = "n"
+		}
 
-		if !sure {
+		lowerdSure := strings.ToLower(sure)
+
+		if lowerdSure != "n" && lowerdSure != "y" {
+			fmt.Println("That is not an option.")
+			return nil
+		}
+
+		if lowerdSure == "n" {
 			return nil
 		}
 	}
