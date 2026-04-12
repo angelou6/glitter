@@ -1,0 +1,87 @@
+package main
+
+import (
+	"fmt"
+	"os/exec"
+)
+
+func addAndCommit(message string) error {
+	if err := exec.Command("git", "add", ".").Run(); err != nil {
+		return err
+	}
+
+	err := exec.Command("git", "commit", "-m", message).Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func amendCommit() error {
+	if err := exec.Command("git", "add", ".").Run(); err != nil {
+		return err
+	}
+
+	err := exec.Command("git", "commit", "--amend", "--no-edit").Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ForcePush(message, blame string) error {
+	err := addAndCommit(message)
+	if err != nil {
+		return err
+	}
+
+	if blame != "" {
+		err = exec.Command("git", "commit", "--amend", "--author", blame, "--no-edit").Run()
+		if err != nil {
+			return err
+		}
+	}
+
+	err = exec.Command("git", "push", "--force").Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ForcePull(skip bool) error {
+	if !skip {
+		var sure bool
+
+		fmt.Println("This will wipe all unsaved changes. Are you sure? [y/N]")
+		fmt.Scan(&sure)
+
+		if !sure {
+			return nil
+		}
+	}
+
+	if err := exec.Command("git", "fetch", "--all").Run(); err != nil {
+		return err
+	}
+	if err := exec.Command("git", "reset", "--hard").Run(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func PushAsLast() error {
+	err := amendCommit()
+	if err != nil {
+		return err
+	}
+
+	err = exec.Command("git", "push", "--force-with-lease").Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
