@@ -8,12 +8,12 @@ import (
 
 func main() {
 	pushCmd := flag.NewFlagSet("push", flag.ExitOnError)
-	last := pushCmd.Bool("last", false, "Amend all new modifications to the latest push")
-	blame := pushCmd.String("blame", "", "Blame this person for the commit (Author <email>)")
-	message := pushCmd.String("m", "fuck you", "Commit message")
+	last := pushCmd.Bool("last", false, "Amend all new modifications to the latest push.")
+	blame := pushCmd.String("blame", "", "Blame this person for the commit (Author <email>).")
+	message := pushCmd.String("m", "fuck you", "Commit message.")
 
 	pullCmd := flag.NewFlagSet("pull", flag.ExitOnError)
-	skip := pullCmd.Bool("fu", false, "Fuck you. Skip all warnings")
+	skip := pullCmd.Bool("fu", false, "Fuck you. Skip all warnings.")
 
 	usage := func() {
 		fmt.Println("Usage: gitfuckyou <command> [arguments]")
