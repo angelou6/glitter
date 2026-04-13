@@ -9,18 +9,25 @@ import (
 	"strings"
 )
 
+func runCommand(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func addAndCommit(message string, force bool) error {
-	if err := exec.Command("git", "add", ".").Run(); err != nil {
+	if err := runCommand("git", "add", "."); err != nil {
 		return err
 	}
 
 	if !force {
-		err := exec.Command("git", "commit", "-m", message).Run()
+		err := runCommand("git", "commit", "-m", message)
 		if err != nil {
 			return err
 		}
 	} else {
-		err := exec.Command("git", "commit", "-m", "I don't know").Run()
+		err := runCommand("git", "commit", "-m", "I don't know")
 		if err != nil {
 			return err
 		}
@@ -29,17 +36,17 @@ func addAndCommit(message string, force bool) error {
 }
 
 func amendCommit(message string) error {
-	if err := exec.Command("git", "add", ".").Run(); err != nil {
+	if err := runCommand("git", "add", "."); err != nil {
 		return err
 	}
 
 	if message == "" {
-		err := exec.Command("git", "commit", "--amend", "--no-edit").Run()
+		err := runCommand("git", "commit", "--amend", "--no-edit")
 		if err != nil {
 			return err
 		}
 	} else {
-		err := exec.Command("git", "commit", "--amend", "-m", message).Run()
+		err := runCommand("git", "commit", "--amend", "-m", message)
 		if err != nil {
 			return err
 		}
@@ -55,19 +62,19 @@ func ForcePush(message, blame string, force bool) error {
 	}
 
 	if blame != "" {
-		err = exec.Command("git", "commit", "--amend", "--author", blame, "--no-edit").Run()
+		err = runCommand("git", "commit", "--amend", "--author", blame, "--no-edit")
 		if err != nil {
 			return err
 		}
 	}
 
 	if force {
-		err = exec.Command("git", "push", "--force").Run()
+		err = runCommand("git", "push", "--force")
 		if err != nil {
 			return err
 		}
 	} else {
-		err = exec.Command("git", "push").Run()
+		err = runCommand("git", "push")
 		if err != nil {
 			return err
 		}
@@ -98,10 +105,10 @@ func ForcePull(skip bool) error {
 		}
 	}
 
-	if err := exec.Command("git", "fetch", "--all").Run(); err != nil {
+	if err := runCommand("git", "fetch", "--all"); err != nil {
 		return err
 	}
-	if err := exec.Command("git", "reset", "--hard").Run(); err != nil {
+	if err := runCommand("git", "reset", "--hard"); err != nil {
 		return err
 	}
 	return nil
@@ -118,7 +125,7 @@ func PushAsLast(message string, force bool) error {
 		f = "--force"
 	}
 
-	err = exec.Command("git", "push", f).Run()
+	err = runCommand("git", "push", f)
 	if err != nil {
 		return err
 	}
