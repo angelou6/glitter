@@ -11,17 +11,17 @@ func main() {
 	last := pushCmd.Bool("last", false, "Amend all new modifications to the latest push.")
 	force := pushCmd.Bool("force", false, "Force push.")
 	blame := pushCmd.String("blame", "", "Blame this person for the commit (Author <email>).")
-	message := pushCmd.String("m", "fuck you", "Commit message.")
+	message := pushCmd.String("m", "I dont know", "Commit message.")
 
 	pullCmd := flag.NewFlagSet("pull", flag.ExitOnError)
-	skip := pullCmd.Bool("fu", false, "Fuck you. Skip all warnings.")
+	skip := pullCmd.Bool("y", false, "Skip warning.")
 
 	usage := func() {
-		fmt.Println("Usage: gitfuckyou <command> [arguments]")
+		fmt.Println("Usage: glitter <command> [arguments]")
 		fmt.Println("\nCommands:")
 		fmt.Println("  push    Force push changes with an optional blame")
 		fmt.Println("  pull    Force pull and reset local changes")
-		fmt.Println("\nUse 'gitfuckyou <command> -h' for more information about a command.")
+		fmt.Println("\nUse 'glitter <command> -h' for more information about a command.")
 	}
 
 	if len(os.Args) < 2 {
