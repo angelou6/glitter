@@ -1,6 +1,4 @@
-# gitfuckyou
-
-A minimalist, aggressive Git helper.
+# glitter
 
 > [!WARNING]
 > This tool uses `--force` and `reset --hard`. It **will** delete data if you are not careful. Use it at your own risk.
@@ -14,7 +12,7 @@ sudo make install
 ## Usage
 
 ```bash
-gitfuckyou <command> [arguments]
+glitter <command> [arguments]
 ```
 
 ### Commands
@@ -28,17 +26,17 @@ Force push changes with an optional blame. It automatically adds all files (`git
 
 **Example:**
 ```bash
-gitfuckyou push -m "Fixed the bug" -blame "Coworker <coworker@company.com>"
+glitter push -m "Fixed the bug" -blame "Coworker <coworker@company.com>"
 ```
 
 #### `pull`
 Force pull and reset local changes. This will wipe all unsaved changes and sync with the remote.
 
-- `-fu`: Skip the "Are you sure?" warning (Fuck You mode).
+- `-y`: Skip the "Are you sure?" warning.
 
 **Example:**
 ```bash
-gitfuckyou pull -fu
+glitter pull -y
 ```
 
 ## Help
@@ -46,6 +44,6 @@ gitfuckyou pull -fu
 Use the `-h` flag with any command to see more information:
 
 ```bash
-gitfuckyou push -h
-gitfuckyou pull -h
+glitter push -h
+glitter pull -h
 ```
