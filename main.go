@@ -9,6 +9,7 @@ import (
 func main() {
 	pushCmd := flag.NewFlagSet("push", flag.ExitOnError)
 	last := pushCmd.Bool("last", false, "Amend all new modifications to the latest push.")
+	force := pushCmd.Bool("force", false, "Force push.")
 	blame := pushCmd.String("blame", "", "Blame this person for the commit (Author <email>).")
 	message := pushCmd.String("m", "fuck you", "Commit message.")
 
@@ -37,7 +38,7 @@ func main() {
 				fmt.Println(err)
 			}
 		} else {
-			err := ForcePush(*message, *blame)
+			err := ForcePush(*message, *blame, *force)
 			if err != nil {
 				fmt.Println(err)
 			}

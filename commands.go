@@ -34,7 +34,7 @@ func amendCommit() error {
 	return nil
 }
 
-func ForcePush(message, blame string) error {
+func ForcePush(message, blame string, force bool) error {
 	err := addAndCommit(message)
 	if err != nil {
 		return err
@@ -47,9 +47,16 @@ func ForcePush(message, blame string) error {
 		}
 	}
 
-	err = exec.Command("git", "push", "--force").Run()
-	if err != nil {
-		return err
+	if force {
+		err = exec.Command("git", "push", "--force").Run()
+		if err != nil {
+			return err
+		}
+	} else {
+		err = exec.Command("git", "push").Run()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -58,7 +65,7 @@ func ForcePush(message, blame string) error {
 func ForcePull(skip bool) error {
 	if !skip {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("This will wipe all unsaved changes. Are you sure? [y/N] ")
+		fmt.Print("This will wipe all uncommited changes. Are you sure? [y/N] ")
 		input, _ := reader.ReadString('\n')
 		sure := strings.TrimSpace(input)
 
