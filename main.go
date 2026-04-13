@@ -11,7 +11,7 @@ func main() {
 	last := pushCmd.Bool("last", false, "Amend all new modifications to the latest push.")
 	force := pushCmd.Bool("force", false, "Force push.")
 	blame := pushCmd.String("blame", "", "Blame this person for the commit (Author <email>).")
-	message := pushCmd.String("m", "I dont know", "Commit message.")
+	message := pushCmd.String("m", "", "Commit message.")
 
 	pullCmd := flag.NewFlagSet("pull", flag.ExitOnError)
 	skip := pullCmd.Bool("y", false, "Skip warning.")
@@ -33,7 +33,12 @@ func main() {
 	case "push":
 		pushCmd.Parse(os.Args[2:])
 		if *last {
-			err := PushAsLast()
+			if *blame != "" {
+				fmt.Println("You cannot use -blame with -last")
+				os.Exit(1)
+			}
+
+			err := PushAsLast(*message, *force)
 			if err != nil {
 				fmt.Println(err)
 			}

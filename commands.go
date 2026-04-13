@@ -9,33 +9,47 @@ import (
 	"strings"
 )
 
-func addAndCommit(message string) error {
+func addAndCommit(message string, force bool) error {
 	if err := exec.Command("git", "add", ".").Run(); err != nil {
 		return err
 	}
 
-	err := exec.Command("git", "commit", "-m", message).Run()
-	if err != nil {
-		return err
+	if !force {
+		err := exec.Command("git", "commit", "-m", message).Run()
+		if err != nil {
+			return err
+		}
+	} else {
+		err := exec.Command("git", "commit", "-m", "I don't know").Run()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-func amendCommit() error {
+func amendCommit(message string) error {
 	if err := exec.Command("git", "add", ".").Run(); err != nil {
 		return err
 	}
 
-	err := exec.Command("git", "commit", "--amend", "--no-edit").Run()
-	if err != nil {
-		return err
+	if message == "" {
+		err := exec.Command("git", "commit", "--amend", "--no-edit").Run()
+		if err != nil {
+			return err
+		}
+	} else {
+		err := exec.Command("git", "commit", "--amend", "-m", message).Run()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func ForcePush(message, blame string, force bool) error {
-	err := addAndCommit(message)
+	err := addAndCommit(message, force)
 	if err != nil {
 		return err
 	}
@@ -93,13 +107,18 @@ func ForcePull(skip bool) error {
 	return nil
 }
 
-func PushAsLast() error {
-	err := amendCommit()
+func PushAsLast(message string, force bool) error {
+	err := amendCommit(message)
 	if err != nil {
 		return err
 	}
 
-	err = exec.Command("git", "push", "--force-with-lease").Run()
+	f := "--force-with-lease"
+	if force {
+		f = "--force"
+	}
+
+	err = exec.Command("git", "push", f).Run()
 	if err != nil {
 		return err
 	}

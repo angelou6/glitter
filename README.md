@@ -20,9 +20,10 @@ glitter <command> [arguments]
 #### `push`
 Force push changes with an optional blame. It automatically adds all files (`git add .`) and commits them before pushing.
 
-- `-m "message"`: Custom commit message (default: "fuck you")
+- `-m "message"`: Custom commit message
 - `-blame "Name <email>"`: Set a specific author for the commit.
 - `-last`: Amend all new modifications to the latest push instead of creating a new one.
+- `-force`: Forces the push to happen even without a commit message.
 
 **Example:**
 ```bash
