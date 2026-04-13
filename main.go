@@ -32,13 +32,22 @@ func main() {
 	case "push":
 		pushCmd.Parse(os.Args[2:])
 		if *last {
-			PushAsLast()
+			err := PushAsLast()
+			if err != nil {
+				fmt.Println(err)
+			}
 		} else {
-			ForcePush(*message, *blame)
+			err := ForcePush(*message, *blame)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 	case "pull":
 		pullCmd.Parse(os.Args[2:])
-		ForcePull(*skip)
+		err := ForcePull(*skip)
+		if err != nil {
+			fmt.Println(err)
+		}
 	case "-h", "--help", "help":
 		usage()
 	default:
