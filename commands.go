@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -68,8 +69,7 @@ func ForcePull(skip bool) error {
 		lowerdSure := strings.ToLower(sure)
 
 		if lowerdSure != "n" && lowerdSure != "y" {
-			fmt.Println("That is not an option.")
-			return nil
+			return errors.New("That is not an option.")
 		}
 
 		if lowerdSure == "n" {
