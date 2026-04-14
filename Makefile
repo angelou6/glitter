@@ -1,5 +1,5 @@
 build:
-	go build
+	cargo build --release
 
 install: build
-	mv glitter /usr/local/bin
+	cp target/release/glitter /usr/local/bin
