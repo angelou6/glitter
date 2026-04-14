@@ -20,7 +20,7 @@ fn add_and_commit(message: &str, force: bool) {
 fn amend_commit(message: &str) {
     run_command(&["git", "add", "."]);
 
-    if !message.is_empty() {
+    if message.is_empty() {
         run_command(&["git", "commit", "--amend", "--no-edit"]);
     } else {
         run_command(&["git", "commit", "--amend", "-m", message]);
@@ -37,7 +37,7 @@ pub fn push(message: &str, blame: &str, force: bool) {
     if force {
         run_command(&["git", "push", "--force"]);
     } else {
-        run_command(&["git", "force"]);
+        run_command(&["git", "push"]);
     }
 }
 
@@ -63,7 +63,6 @@ pub fn force_pull(skip: bool) {
     run_command(&["git", "fetch", "--all"]);
     run_command(&["git", "reset", "--hard"]);
 }
-
 
 pub fn push_as_last(message: &str, force: bool) {
     amend_commit(message);
