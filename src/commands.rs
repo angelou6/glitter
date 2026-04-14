@@ -1,8 +1,6 @@
 use std::{io::{self, Write}, process::Command};
 
-fn run_command(command: &str) {
-    let args: Vec<&str> = command.split(" ").collect();
-
+fn run_command(args: &[&str]) {
     Command::new(args[0])
         .args(&args[1..])
         .status()
@@ -15,17 +13,17 @@ fn run_command(command: &str) {
 fn add_and_commit(message: &str, force: bool) {
     let message = if force { "I don't know" } else { message };
 
-    run_command("git add .");
-    run_command(&format!("git commit -m {message}"));
+    run_command(&["git", "add", "."]);
+    run_command(&["git", "commit", "-m", message]);
 }
 
 fn amend_commit(message: &str) {
-    run_command("git add .");
+    run_command(&["git", "add", "."]);
 
     if !message.is_empty() {
-        run_command("git commit --amend --no-edit");
+        run_command(&["git", "commit", "--amend", "--no-edit"]);
     } else {
-        run_command(&format!("git commit --amend -m {message}"));
+        run_command(&["git", "commit", "--amend", "-m", message]);
     }
 }
 
@@ -33,13 +31,13 @@ pub fn push(message: &str, blame: &str, force: bool) {
     add_and_commit(message, force);
 
     if !blame.is_empty() {
-        run_command(&format!("git commit --amend --author {blame} --no-edit"));
+        run_command(&["git", "commit", "--amend", "--author", blame, "--no-edit"]);
     }
 
     if force {
-        run_command("git push --force");
+        run_command(&["git", "push", "--force"]);
     } else {
-        run_command("git push");
+        run_command(&["git", "force"]);
     }
 }
 
@@ -62,13 +60,13 @@ pub fn force_pull(skip: bool) {
         }
     }
 
-    run_command("git fetch --all");
-    run_command("git reset --hard");
+    run_command(&["git", "fetch", "--all"]);
+    run_command(&["git", "reset", "--hard"]);
 }
 
 
 pub fn push_as_last(message: &str, force: bool) {
     amend_commit(message);
     let force = if force { "--force" } else { "--force-with-lease" };
-    run_command(&format!("git push {force}"));
+    run_command(&["git", "push", force]);
 }
