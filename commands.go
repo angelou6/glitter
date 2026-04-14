@@ -17,20 +17,17 @@ func runCommand(name string, args ...string) error {
 }
 
 func addAndCommit(message string, force bool) error {
+	if force && message == "" {
+		message = "i don't know"
+	}
+
 	if err := runCommand("git", "add", "."); err != nil {
 		return err
 	}
 
-	if !force {
-		err := runCommand("git", "commit", "-m", message)
-		if err != nil {
-			return err
-		}
-	} else {
-		err := runCommand("git", "commit", "-m", "I don't know")
-		if err != nil {
-			return err
-		}
+	err := runCommand("git", "commit", "-m", message)
+	if err != nil {
+		return err
 	}
 	return nil
 }
