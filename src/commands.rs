@@ -44,7 +44,7 @@ pub fn push(message: &str, blame: &str, force: bool) {
 pub fn force_pull(skip: bool) {
     if !skip {
         let mut input = String::new();
-        print!("This will wipe all uncommited changes. Are you sure? [y/N] ");
+        print!("This will wipe uncommited changes. Are you sure? [y/N] ");
         io::stdout().flush().expect("Could not print");
         io::stdin().read_line(&mut input).expect("Error reading message");
 
@@ -60,8 +60,8 @@ pub fn force_pull(skip: bool) {
         }
     }
 
-    run_command(&["git", "fetch", "--all"]);
-    run_command(&["git", "reset", "--hard"]);
+    run_command(&["git", "fetch", "origin"]);
+    run_command(&["git", "reset", "--hard", "@{u}"]);
 }
 
 pub fn push_as_last(message: &str, force: bool) {
