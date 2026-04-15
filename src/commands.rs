@@ -23,7 +23,7 @@ pub fn run_command_output(args: &[&str]) -> String {
 
 pub fn add_and_commit(message: &str, force: bool) {
     run_command(&["git", "add", "."]);
-    if force {
+    if force && message.is_empty() {
         // Get list of changed files and turn them into a commit message
         // message: "Changed: file1, file2"
         let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);

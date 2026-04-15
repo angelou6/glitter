@@ -2,8 +2,6 @@ use crate::commands::{run_command, run_command_output};
 
 pub fn open(url: &str) {
     match std::env::consts::OS {
-        // I have no idea if it actually works on windows
-        // but im also not going to test it
         "windows" => {
             run_command(&["cmd", "/c", "start", url]);
         }
