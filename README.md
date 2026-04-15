@@ -14,22 +14,36 @@ glitter <command> [arguments]
 
 ### Commands
 
+#### `commit`
+Stage all files and commit. 
+
+- `-m "message"`, `--message "message"`: Commit message
+- `--amend`: Amend all new modifications to the latest commit instead of creating a new one
+- `-f`, `--force`: Force commit even without a message
+
+**Examples:**
+```bash
+glitter commit -m "Fixed the bug"
+glitter commit --amend
+```
+
 #### `push`
-Force push changes. It automatically adds all files (`git add .`) and commits them before pushing.
+Stage, commit, and push changes.
 
-- `-m "message"`: Custom commit message
-- `--last`: Amend all new modifications to the latest push instead of creating a new one.
-- `--force`: Forces the push to happen even without a commit message.
+- `-m "message"`, `--message "message"`: Commit message
+- `--amend`: Amend all new modifications to the latest push instead of creating a new one
+- `-f`, `--force`: Force push even without a commit message
 
-**Example:**
+**Examples:**
 ```bash
 glitter push -m "Fixed the bug"
+glitter push --amend
 ```
 
 #### `pull`
 Force pull and reset local changes. This will wipe uncommited changes and sync with the remote.
 
-- `-y`: Skip the "Are you sure?" warning.
+- `-y`, `--yes`: Skip the "Are you sure?" warning.
 
 **Example:**
 ```bash

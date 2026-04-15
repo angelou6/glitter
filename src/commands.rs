@@ -21,14 +21,21 @@ pub fn run_command_output(args: &[&str]) -> String {
     return String::from_utf8_lossy(&out.stdout).trim().to_string();
 }
 
-fn add_and_commit(message: &str, force: bool) {
-    let message = if force { "I don't know" } else { message };
-
+pub fn add_and_commit(message: &str, force: bool) {
     run_command(&["git", "add", "."]);
-    run_command(&["git", "commit", "-m", message]);
+    if force {
+        // Get list of changed files and turn them into a commit message
+        // message: "Changed: file1, file2"
+        let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
+        let mut list = changed.trim().split('\n').collect::<Vec<_>>().join(", ");
+        list.insert_str(0, "Changed: ");
+        run_command(&["git", "commit", "-m", &list]);
+    } else {
+        run_command(&["git", "commit", "-m", message]);
+    }
 }
 
-fn amend_commit(message: &str) {
+pub fn amend_commit(message: &str) {
     run_command(&["git", "add", "."]);
 
     if message.is_empty() {

@@ -3,7 +3,7 @@ mod url;
 
 use clap::{Parser, Subcommand, Args};
 
-use crate::{commands::{force_pull, push, push_as_last}, url::{get_commit_url, get_project_url, open}};
+use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_last}, url::{get_commit_url, get_project_url, open}};
 
 #[derive(Parser)]
 #[command(
@@ -21,6 +21,8 @@ struct Cli {
 enum Commands {
     /// Push changes
     Push(PushArgs),
+    /// Commit changes
+    Commit(CommitArgs),
     /// Force pull and reset local changes
     Pull(PullArgs),
     /// Open the project in the default web browser
@@ -28,25 +30,40 @@ enum Commands {
 }
 
 #[derive(Args)]
+struct CommitArgs {
+    /// Commit message
+    #[arg(short, long)]
+    message: Option<String>,
+
+    /// Amend all new modifications to the latest commit
+    #[arg(long)]
+    amend: bool,
+
+    /// Force commit even without message
+    #[arg(short, long)]
+    force: bool,
+}
+
+#[derive(Args)]
 struct PushArgs {
     /// Amend all new modifications to the latest push
     #[arg(long)]
-    last: bool,
+    amend: bool,
 
     /// Force push
-    #[arg(long)]
+    #[arg(short, long)]
     force: bool,
 
     /// Commit message
-    #[arg(short = 'm')]
+    #[arg(short, long)]
     message: Option<String>,
 }
 
 #[derive(Args)]
 struct PullArgs {
     /// Skip warning
-    #[arg(short = 'y')]
-    skip: bool,
+    #[arg(short, long)]
+    yes: bool,
 }
 
 #[derive(Args)]
@@ -63,7 +80,7 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Push(args) => {
-            if args.last {
+            if args.amend {
                 push_as_last(
                     args.message.as_deref().unwrap_or(""),
                     args.force,
@@ -75,8 +92,15 @@ fn main() {
                 );
             }
         }
+        Commands::Commit(args) => {
+            if args.amend {
+                amend_commit(&args.message.unwrap_or("".to_owned()));
+            } else {
+                add_and_commit(&args.message.unwrap_or("".to_owned()), args.force);
+            }
+        }
         Commands::Pull(args) => {
-            force_pull(args.skip);
+            force_pull(args.yes);
         }
         Commands::Open(args) => {
             let remote = get_project_url();
