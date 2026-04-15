@@ -1,16 +1,6 @@
 use std::{io::{self, Write}, process::Command};
 
-pub fn run_command(args: &[&str]) {
-    Command::new(args[0])
-        .args(&args[1..])
-        .status()
-        .unwrap_or_else(|e| {
-           eprintln!("{e}");
-           std::process::exit(1);
-        });
-}
-
-pub fn run_command_output(args: &[&str]) -> String {
+pub fn run_command(args: &[&str]) -> String {
     let out = Command::new(args[0])
         .args(&args[1..])
         .output()
@@ -23,10 +13,10 @@ pub fn run_command_output(args: &[&str]) -> String {
 
 pub fn add_and_commit(message: &str, force: bool) {
     run_command(&["git", "add", "."]);
-    if force {
+    if force && message.is_empty() {
         // Get list of changed files and turn them into a commit message
         // message: "Changed: file1, file2"
-        let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
+        let changed = run_command(&["git", "diff", "--name-only", "--staged"]);
         let mut list = changed.trim().split('\n').collect::<Vec<_>>().join(", ");
         list.insert_str(0, "Changed: ");
         run_command(&["git", "commit", "-m", &list]);
