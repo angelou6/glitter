@@ -18,16 +18,15 @@ glitter <command> [arguments]
 ### Commands
 
 #### `push`
-Force push changes with an optional blame. It automatically adds all files (`git add .`) and commits them before pushing.
+Force push changes. It automatically adds all files (`git add .`) and commits them before pushing.
 
 - `-m "message"`: Custom commit message
-- `--blame "Name <email>"`: Set a specific author for the commit.
 - `--last`: Amend all new modifications to the latest push instead of creating a new one.
 - `--force`: Forces the push to happen even without a commit message.
 
 **Example:**
 ```bash
-glitter push -m "Fixed the bug" --blame "Coworker <coworker@company.com>"
+glitter push -m "Fixed the bug"
 ```
 
 #### `pull`

@@ -27,13 +27,8 @@ fn amend_commit(message: &str) {
     }
 }
 
-pub fn push(message: &str, blame: &str, force: bool) {
+pub fn push(message: &str, force: bool) {
     add_and_commit(message, force);
-
-    if !blame.is_empty() {
-        run_command(&["git", "commit", "--amend", "--author", blame, "--no-edit"]);
-    }
-
     if force {
         run_command(&["git", "push", "--force"]);
     } else {

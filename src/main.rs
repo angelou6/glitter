@@ -34,10 +34,6 @@ struct PushArgs {
     #[arg(long)]
     force: bool,
 
-    /// Blame this person for the commit (Author <email>)
-    #[arg(long)]
-    blame: Option<String>,
-
     /// Commit message
     #[arg(short = 'm')]
     message: Option<String>,
@@ -56,14 +52,6 @@ fn main() {
     match cli.command {
         Commands::Push(args) => {
             if args.last {
-                match args.blame {
-                    Some(_) => {
-                        println!("You cannot use --blame with --last");
-                        std::process::exit(1);
-                    }
-                    None => ()
-                }
-
                 push_as_last(
                     args.message.as_deref().unwrap_or(""),
                     args.force,
@@ -71,7 +59,6 @@ fn main() {
             } else {
                 push(
                     args.message.as_deref().unwrap_or(""),
-                    args.blame.as_deref().unwrap_or(""),
                     args.force,
                 );
             }
