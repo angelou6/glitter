@@ -1,6 +1,6 @@
 use std::{io::{self, Write}, process::Command};
 
-fn run_command(args: &[&str]) {
+pub fn run_command(args: &[&str]) {
     Command::new(args[0])
         .args(&args[1..])
         .status()
@@ -8,6 +8,17 @@ fn run_command(args: &[&str]) {
            eprintln!("{e}");
            std::process::exit(1);
         });
+}
+
+pub fn run_command_output(args: &[&str]) -> String {
+    let out = Command::new(args[0])
+        .args(&args[1..])
+        .output()
+        .unwrap_or_else(|e| {
+           eprintln!("{e}");
+           std::process::exit(1);
+        });
+    return String::from_utf8_lossy(&out.stdout).trim().to_string();
 }
 
 fn add_and_commit(message: &str, force: bool) {

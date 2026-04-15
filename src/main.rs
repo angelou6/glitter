@@ -1,8 +1,9 @@
 mod commands;
+mod url;
 
 use clap::{Parser, Subcommand, Args};
 
-use crate::commands::{force_pull, push, push_as_last};
+use crate::{commands::{force_pull, push, push_as_last}, url::{get_commit_url, get_project_url, open}};
 
 #[derive(Parser)]
 #[command(
@@ -22,6 +23,8 @@ enum Commands {
     Push(PushArgs),
     /// Force pull and reset local changes
     Pull(PullArgs),
+    /// Open the project in the default web browser
+    Open(OpenArgs),
 }
 
 #[derive(Args)]
@@ -46,9 +49,18 @@ struct PullArgs {
     skip: bool,
 }
 
+#[derive(Args)]
+struct OpenArgs {
+    /// Open a specific commit
+    commit: Option<String>,
+
+    /// Print the URL instead of opening it
+    #[arg(long)]
+    dump: bool,
+}
+
 fn main() {
     let cli = Cli::parse();
-
     match cli.command {
         Commands::Push(args) => {
             if args.last {
@@ -65,6 +77,26 @@ fn main() {
         }
         Commands::Pull(args) => {
             force_pull(args.skip);
+        }
+        Commands::Open(args) => {
+            let remote = get_project_url();
+            match args.commit {
+                Some(commit) => {
+                    let url = get_commit_url(&commit);
+                    if !args.dump {
+                        open(&url);
+                    } else {
+                        println!("{url}")
+                    }
+                }
+                None => {
+                    if !args.dump {
+                        open(&remote);
+                    } else {
+                        println!("{remote}")
+                    }
+                }
+            }
         }
     }
 }
