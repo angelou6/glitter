@@ -39,6 +39,18 @@ Force pull and reset local changes. This will wipe uncommited changes and sync w
 glitter pull -y
 ```
 
+#### `open`
+Open the project in the default web browser. If a commit is provided, opens that specific commit instead.
+
+- `[commit]`: Open a specific commit
+- `--dump`: Print the URL instead of opening it
+
+**Examples:**
+```bash
+glitter open
+glitter open HEAD
+```
+
 ## Help
 
 Use the `-h` flag with any command to see more information:
