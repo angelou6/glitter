@@ -1,8 +1,5 @@
 # glitter
 
-> [!WARNING]
-> This tool uses `--force` and `reset --hard`. It **will** delete data if you are not careful. Use it at your own risk.
-
 ## Installation
 
 ```bash
