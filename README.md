@@ -19,6 +19,7 @@ Stage all files and commit.
 
 - `-m "message"`, `--message "message"`: Commit message
 - `--amend`: Amend all new modifications to the latest commit instead of creating a new one
+- `--undo`: Undo the latest commit
 - `-f`, `--force`: Force commit even without a message
 
 **Examples:**
@@ -32,6 +33,7 @@ Stage, commit, and push changes.
 
 - `-m "message"`, `--message "message"`: Commit message
 - `--amend`: Amend all new modifications to the latest push instead of creating a new one
+- `--undo`: Undo the latest push
 - `-f`, `--force`: Force push even without a commit message
 
 **Examples:**
