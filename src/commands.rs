@@ -24,8 +24,6 @@ pub fn run_command_output(args: &[&str]) -> String {
 pub fn add_and_commit(message: &str, force: bool) {
     run_command(&["git", "add", "."]);
     if force && message.is_empty() {
-        // Get list of changed files and turn them into a commit message
-        // message: "Changed: file1, file2"
         let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
         let mut list = changed.trim().split('\n').collect::<Vec<_>>().join(", ");
         list.insert_str(0, "Changed: ");
@@ -79,6 +77,16 @@ pub fn force_pull(skip: bool) {
 
 pub fn push_as_last(message: &str, force: bool) {
     amend_commit(message);
+    let force = if force { "--force" } else { "--force-with-lease" };
+    run_command(&["git", "push", force]);
+}
+
+pub fn undo_commit() {
+    run_command(&["git", "reset", "HEAD~1"]);
+}
+
+pub fn undo_push(force: bool) {
+    undo_commit();
     let force = if force { "--force" } else { "--force-with-lease" };
     run_command(&["git", "push", force]);
 }

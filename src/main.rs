@@ -3,7 +3,7 @@ mod url;
 
 use clap::{Parser, Subcommand, Args};
 
-use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_last}, url::{get_commit_url, get_project_url, open}};
+use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_last, undo_commit, undo_push}, url::{get_commit_url, get_project_url, open}};
 
 #[derive(Parser)]
 #[command(
@@ -12,6 +12,7 @@ use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_l
     subcommand_required = true,
     arg_required_else_help = true,
 )]
+
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -42,6 +43,10 @@ struct CommitArgs {
     /// Force commit even without message
     #[arg(short, long)]
     force: bool,
+
+    /// Undo last commit
+    #[arg(long)]
+    undo: bool,
 }
 
 #[derive(Args)]
@@ -57,6 +62,10 @@ struct PushArgs {
     /// Commit message
     #[arg(short, long)]
     message: Option<String>,
+
+    /// Undo last push
+    #[arg(long)]
+    undo: bool,
 }
 
 #[derive(Args)]
@@ -80,7 +89,9 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Push(args) => {
-            if args.amend {
+            if args.undo {
+                undo_push(args.force);
+            } else if args.amend {
                 push_as_last(
                     args.message.as_deref().unwrap_or(""),
                     args.force,
@@ -93,7 +104,9 @@ fn main() {
             }
         }
         Commands::Commit(args) => {
-            if args.amend {
+            if args.undo {
+                undo_commit();
+            } else if args.amend {
                 amend_commit(&args.message.unwrap_or("".to_owned()));
             } else {
                 add_and_commit(&args.message.unwrap_or("".to_owned()), args.force);
