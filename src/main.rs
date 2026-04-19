@@ -9,10 +9,10 @@ use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_l
 #[command(
     name = "glitter",
     about = "Usage: glitter <command> [arguments]",
+    version,
     subcommand_required = true,
     arg_required_else_help = true,
 )]
-
 struct Cli {
     #[command(subcommand)]
     command: Commands,
