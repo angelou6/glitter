@@ -1,6 +1,8 @@
 mod commands;
 mod url;
 
+use std::process;
+
 use clap::{Parser, Subcommand, Args};
 
 use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_last, undo_commit, undo_push}, url::{get_commit_url, get_project_url, open}};
@@ -34,7 +36,7 @@ enum Commands {
 struct CommitArgs {
     /// Commit message
     #[arg(short, long)]
-    message: Option<String>,
+    message: Vec<String>,
 
     /// Amend all new modifications to the latest commit
     #[arg(long)]
@@ -61,7 +63,7 @@ struct PushArgs {
 
     /// Commit message
     #[arg(short, long)]
-    message: Option<String>,
+    message: Vec<String>,
 
     /// Undo last push
     #[arg(long)]
@@ -89,27 +91,40 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Push(args) => {
+            if args.message.len() > 2 {
+                eprintln!("You can only use a max of 2 messages.");
+                process::exit(1);
+            }
+
             if args.undo {
                 undo_push(args.force);
             } else if args.amend {
                 push_as_last(
-                    args.message.as_deref().unwrap_or(""),
+                    args.message,
                     args.force,
                 );
             } else {
                 push(
-                    args.message.as_deref().unwrap_or(""),
+                    args.message,
                     args.force,
                 );
             }
         }
         Commands::Commit(args) => {
+            if args.message.len() > 2 {
+                eprintln!("You can only use a max of 2 messages.");
+                process::exit(1);
+            }
+
             if args.undo {
                 undo_commit();
             } else if args.amend {
-                amend_commit(&args.message.unwrap_or("".to_owned()));
+                amend_commit(args.message);
             } else {
-                add_and_commit(&args.message.unwrap_or("".to_owned()), args.force);
+                add_and_commit(
+                    args.message,
+                    args.force
+                );
             }
         }
         Commands::Pull(args) => {

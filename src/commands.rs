@@ -21,29 +21,40 @@ pub fn run_command_output(args: &[&str]) -> String {
     return String::from_utf8_lossy(&out.stdout).trim().to_string();
 }
 
-pub fn add_and_commit(message: &str, force: bool) {
+pub fn add_and_commit(message: Vec<String>, force: bool) {
     run_command(&["git", "add", "."]);
-    if force && message.is_empty() {
-        let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
-        let mut list = changed.trim().split('\n').collect::<Vec<_>>().join(", ");
-        list.insert_str(0, "Changed: ");
-        run_command(&["git", "commit", "-m", &list]);
+    match message.len() {
+        0 => {
+            if force {
+                let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
+                let mut list = changed.trim().split('\n').collect::<Vec<_>>().join(", ");
+                list.insert_str(0, "Changed: ");
+                run_command(&["git", "commit", "-m", &list]);
+            }
+        }
+        1 => run_command(&["git", "commit", "-m", &message[0]]),
+        2 => run_command(&["git", "commit", "-m", &message[0], "-m", &message[1]]),
+        _ => unreachable!()
+    }
+
+    if force && message.len() == 0 {
     } else {
-        run_command(&["git", "commit", "-m", message]);
+
     }
 }
 
-pub fn amend_commit(message: &str) {
+pub fn amend_commit(message: Vec<String>) {
     run_command(&["git", "add", "."]);
 
-    if message.is_empty() {
-        run_command(&["git", "commit", "--amend", "--no-edit"]);
-    } else {
-        run_command(&["git", "commit", "--amend", "-m", message]);
+    match message.len() {
+        0 =>  run_command(&["git", "commit", "--amend", "--no-edit"]),
+        1 => run_command(&["git", "commit", "--amend", "-m", &message[0]]),
+        2 => run_command(&["git", "commit", "--amend", "-m", &message[0], "-m", &message[1]]),
+        _ => unreachable!()
     }
 }
 
-pub fn push(message: &str, force: bool) {
+pub fn push(message: Vec<String>, force: bool) {
     add_and_commit(message, force);
     if force {
         run_command(&["git", "push", "--force"]);
@@ -75,7 +86,7 @@ pub fn force_pull(skip: bool) {
     run_command(&["git", "reset", "--hard", "@{u}"]);
 }
 
-pub fn push_as_last(message: &str, force: bool) {
+pub fn push_as_last(message: Vec<String>, force: bool) {
     amend_commit(message);
     let force = if force { "--force" } else { "--force-with-lease" };
     run_command(&["git", "push", force]);
