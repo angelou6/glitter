@@ -27,19 +27,16 @@ pub fn add_and_commit(message: Vec<String>, force: bool) {
         0 => {
             if force {
                 let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
-                let mut list = changed.trim().split('\n').collect::<Vec<_>>().join(", ");
-                list.insert_str(0, "Changed: ");
-                run_command(&["git", "commit", "-m", &list]);
+                let files: Vec<_> = changed.trim().split('\n').collect();
+                let count = files.len();
+                let msg = format!("Changed {} file{}", count, if count == 1 { "" } else { "s" });
+                let list_str = format!("Files changed: {}", files.join(", "));
+                run_command(&["git", "commit", "-m", &msg, "-m", &list_str]);
             }
         }
         1 => run_command(&["git", "commit", "-m", &message[0]]),
         2 => run_command(&["git", "commit", "-m", &message[0], "-m", &message[1]]),
         _ => unreachable!()
-    }
-
-    if force && message.len() == 0 {
-    } else {
-
     }
 }
 
