@@ -11,7 +11,6 @@ use crate::{commands::{add_and_commit, amend_commit, force_pull, push, push_as_l
 #[command(
     name = "glitter",
     about = "Usage: glitter <command> [arguments]",
-    version,
     subcommand_required = true,
     arg_required_else_help = true,
 )]
@@ -22,11 +21,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Push changes
+    /// Stage, commit, and push changes
     Push(PushArgs),
-    /// Commit changes
+    /// Stage all files and commit
     Commit(CommitArgs),
-    /// Force pull and reset local changes
+    ///  Force pull and reset local changes
     Pull(PullArgs),
     /// Open the project in the default web browser
     Open(OpenArgs),
@@ -135,9 +134,7 @@ fn main() {
                 );
             }
         }
-        Commands::Pull(args) => {
-            force_pull(args.yes);
-        }
+        Commands::Pull(args) => force_pull(args.yes),
         Commands::Open(args) => {
             let remote = get_project_url();
             match args.commit {
