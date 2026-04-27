@@ -6,6 +6,11 @@
 sudo make install
 ```
 
+or place it in `~/.local/bin` with:
+```bash
+make local_install
+```
+
 ## Usage
 
 ```bash
