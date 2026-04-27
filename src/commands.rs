@@ -92,12 +92,16 @@ pub fn push_as_last(message: Vec<String>, force: bool) {
     run_command(&["git", "push", force]);
 }
 
-pub fn undo_commit() {
-    run_command(&["git", "reset", "HEAD~1"]);
+pub fn undo_commit(hard: bool) {
+    if hard {
+        run_command(&["git", "reset", "--hard", "HEAD~1"]);
+    } else {
+        run_command(&["git", "reset", "HEAD~1"]);
+    }
 }
 
-pub fn undo_push(force: bool) {
-    undo_commit();
+pub fn undo_push(force: bool, hard: bool) {
+    undo_commit(hard);
     let force = if force { "--force" } else { "--force-with-lease" };
     run_command(&["git", "push", force]);
 }
