@@ -49,6 +49,10 @@ struct CommitArgs {
     /// Undo last commit
     #[arg(long)]
     undo: bool,
+
+    /// Undo last push hard
+    #[arg(long)]
+    hard_undo: bool,
 }
 
 #[derive(Args)]
@@ -68,6 +72,10 @@ struct PushArgs {
     /// Undo last push
     #[arg(long)]
     undo: bool,
+
+    /// Undo last push hard
+    #[arg(long)]
+    hard_undo: bool,
 }
 
 #[derive(Args)]
@@ -96,8 +104,8 @@ fn main() {
                 process::exit(1);
             }
 
-            if args.undo {
-                undo_push(args.force);
+            if args.undo || args.hard_undo {
+                undo_push(args.force, args.hard_undo);
             } else if args.amend {
                 push_as_last(
                     args.message,
@@ -116,8 +124,8 @@ fn main() {
                 process::exit(1);
             }
 
-            if args.undo {
-                undo_commit();
+            if args.undo || args.hard_undo {
+                undo_commit(args.hard_undo);
             } else if args.amend {
                 amend_commit(args.message);
             } else {
