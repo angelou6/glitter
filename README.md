@@ -24,7 +24,6 @@ Stage all files and commit.
 
 - `-m "message"`, `--message "message"`: Commit message
 - `--amend`: Amend all new modifications to the latest commit instead of creating a new one
-- `--undo`: Undo the latest commit
 - `-f`, `--force`: Force commit even without a message
 
 **Examples:**
@@ -38,13 +37,26 @@ Stage, commit, and push changes.
 
 - `-m "message"`, `--message "message"`: Commit message
 - `--amend`: Amend all new modifications to the latest push instead of creating a new one
-- `--undo`: Undo the latest push
 - `-f`, `--force`: Force push even without a commit message
 
 **Examples:**
 ```bash
 glitter push -m "Fixed the bug"
 glitter push --amend
+```
+
+#### `commit/push undo`
+You can also undo both commit and push using the undo subcommand.
+
+- `--hard`: Undo hard
+
+**Examples:**
+```bash
+glitter push undo
+glitter push --hard
+
+glitter commit undo
+glitter commit --hard
 ```
 
 #### `pull`
