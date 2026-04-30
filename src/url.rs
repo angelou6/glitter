@@ -16,11 +16,11 @@ pub fn open(url: &str) {
 
 pub fn get_project_url() -> String {
     let remote = run_command_output(&["git", "remote", "get-url", "origin"]);
-    return remote.replace(".git", "");
+    remote.replace(".git", "")
 }
 
 pub fn get_commit_url(commit: &str) -> String {
     let remote = get_project_url();
     let hash = run_command_output(&["git", "rev-parse", commit]);
-    return format!("{remote}/commit/{hash}")
+    format!("{remote}/commit/{hash}")
 }
