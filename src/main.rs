@@ -1,19 +1,14 @@
 mod commands;
+mod git;
+mod stage;
 mod url;
 
 use clap::{Args, Parser, Subcommand};
 
-use crate::{
-    commands::{
-        add_and_commit, amend_commit, amend_push, force_pull, push, undo_commit, undo_push,
-    },
-    url::{get_commit_url, get_project_url, open},
-};
-
 #[derive(Parser)]
 #[command(
     name = "glitter",
-    about = "Usage: glitter <command> [arguments]",
+    about = "Opinionated git shortcuts",
     subcommand_required = true,
     arg_required_else_help = true
 )]
@@ -28,6 +23,8 @@ enum Commands {
     Push(CommitPushArgs),
     /// Stage all files and commit
     Commit(CommitPushArgs),
+    /// Stage files
+    Add(AddArgs),
     ///  Force pull and reset local changes
     Pull(PullArgs),
     /// Open the project in the default web browser
@@ -70,6 +67,15 @@ struct CommitPushArgs {
 }
 
 #[derive(Args)]
+struct AddArgs {
+    files: Vec<String>,
+
+    /// Revert
+    #[arg(short, long)]
+    revert: bool,
+}
+
+#[derive(Args)]
 struct PullArgs {
     /// Skip warning
     #[arg(short, long)]
@@ -82,7 +88,7 @@ struct OpenArgs {
     commit: Option<String>,
 
     /// Print the URL instead of opening it
-    #[arg(long)]
+    #[arg(short, long)]
     dump: bool,
 }
 
@@ -100,40 +106,48 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Push(args) => {
             validate_messages(&args.message)?;
             match args.undo_command {
-                Some(UndoCommads::Undo(undo_args)) => undo_push(args.force, undo_args.hard),
-                None if args.amend => amend_push(args.message, args.force),
-                None => push(args.message, args.force, args.all),
+                Some(UndoCommads::Undo(undo_args)) => git::undo_push(args.force, undo_args.hard),
+                None if args.amend => git::amend_push(args.message, args.force),
+                None => git::push(args.message, args.force, args.all),
             }
         }
         Commands::Commit(args) => {
             validate_messages(&args.message)?;
             match args.undo_command {
-                Some(UndoCommads::Undo(undo_args)) => undo_commit(undo_args.hard),
-                None if args.amend => amend_commit(args.message),
-                None => add_and_commit(args.message, args.force, args.all),
+                Some(UndoCommads::Undo(undo_args)) => git::undo_commit(undo_args.hard),
+                None if args.amend => git::amend_commit(args.message),
+                None => git::add_and_commit(args.message, args.force, args.all),
             }
         }
-        Commands::Pull(args) => force_pull(args.yes),
+        Commands::Add(args) => {
+            if args.files.len() > 0 {
+                if args.revert {
+                    git::revert_stage(args.files);
+                } else {
+                    git::stage_files(args.files);
+                }
+            } else {
+                let mut interface = stage::Interface::new()?;
+                interface.draw()?;
+            }
+        }
+        Commands::Pull(args) => git::force_pull(args.yes),
         Commands::Open(args) => {
-            let remote = get_project_url();
+            let remote = url::get_project_url();
             match args.commit {
                 Some(commit) => {
-                    let url = get_commit_url(&commit);
+                    let url = url::get_commit_url(&commit);
                     if !args.dump {
-                        open(&url);
+                        url::open(&url);
                     } else {
                         println!("{url}")
                     }
                 }
-                None => {
-                    if !args.dump {
-                        open(&remote);
-                    } else {
-                        println!("{remote}")
-                    }
-                }
+                None if !args.dump => url::open(&remote),
+                None => println!("{remote}"),
             }
         }
     }
+
     Ok(())
 }
