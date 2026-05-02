@@ -27,7 +27,7 @@ enum Commands {
     Add(AddArgs),
     ///  Force pull and reset local changes
     Pull(PullArgs),
-    /// Open the project in the default web browser
+    /// Open the repository in the default web browser
     Open(OpenArgs),
 }
 
