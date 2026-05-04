@@ -144,3 +144,13 @@ pub fn stage_files(files: Vec<String>) {
     args.extend(files.iter().map(String::as_str));
     run_command(&args);
 }
+
+pub fn init(message: Vec<String>) {
+    run_command_output(&["git", "init"]);
+    let message = if message.len() == 0 {
+        vec!["initial commit".to_owned()]
+    } else {
+        message
+    };
+    add_and_commit(message, false, true);
+}
