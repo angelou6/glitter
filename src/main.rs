@@ -1,5 +1,6 @@
 mod commands;
 mod git;
+mod publish;
 mod stage;
 mod url;
 
@@ -21,6 +22,8 @@ struct Cli {
 enum Commands {
     /// Stage, commit, and push changes
     Push(CommitPushArgs),
+    /// Initialize a git repo
+    Init(InitArgs),
     /// Stage all files and commit
     Commit(CommitPushArgs),
     /// Stage files
@@ -35,6 +38,47 @@ enum Commands {
 enum UndoCommads {
     /// Undo latest
     Undo(UndoArgs),
+}
+
+#[derive(Subcommand)]
+enum PublishCommand {
+    /// Publish online, public by default
+    Publish(PublishArgs),
+}
+
+#[derive(Args)]
+struct InitArgs {
+    /// Commit message
+    #[arg(short, long)]
+    message: Vec<String>,
+
+    /// Force commit to execute
+    #[arg(short, long)]
+    force: bool,
+
+    #[command(subcommand)]
+    publish_command: Option<PublishCommand>,
+}
+
+#[derive(Args)]
+struct PublishArgs {
+    /// Name of repo
+    #[arg(short, long)]
+    name: Option<String>,
+
+    /// Description of repo
+    #[arg(short, long)]
+    desc: Option<String>,
+
+    /// Repo visibility
+    #[arg(short, long)]
+    private: bool,
+}
+
+impl PublishArgs {
+    fn is_empty(&self) -> bool {
+        self.name.is_none() && self.desc.is_none() && !self.private
+    }
 }
 
 #[derive(Args)]
@@ -94,7 +138,7 @@ struct OpenArgs {
 
 fn validate_messages(messages: &Vec<String>) -> Result<(), String> {
     if messages.len() > 2 {
-        Err(String::from("You can only use a max of 2 messages."))
+        Err(String::from("You can only have a name and description."))
     } else {
         Ok(())
     }
@@ -103,6 +147,19 @@ fn validate_messages(messages: &Vec<String>) -> Result<(), String> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     match cli.command {
+        Commands::Init(args) => {
+            validate_messages(&args.message)?;
+            git::init(args.message);
+            if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
+                if !p_args.is_empty() {
+                    let name = p_args.name.unwrap();
+                    let desc = p_args.desc.unwrap_or(String::new());
+                    publish::github(name, desc, p_args.private)
+                } else if let Some((name, desc, private)) = publish::draw() {
+                    publish::github(name, desc, private)
+                }
+            }
+        }
         Commands::Push(args) => {
             validate_messages(&args.message)?;
             match args.undo_command {

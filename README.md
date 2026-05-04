@@ -5,16 +5,47 @@ Opinionated Git shortcuts. Designed to streamline, not replace.
 ## Installation
 
 On `/usr/local/bin/glitter`
+
 ```bash
 sudo make install
 ```
 
 On `~/.local/bin`:
+
 ```bash
 make local_install
 ```
 
 ## Commands
+
+### `init`
+
+Initialize git repo
+
+```
+Usage: glitter init [OPTIONS] [COMMAND]
+
+Commands:
+  publish  Publish online, public by default
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -m, --message <MESSAGE>  Commit message
+  -f, --force              Force commit to execute
+  -h, --help               Print help
+```
+
+`Publish` the local repo, with commands or a simple TUI. Public by default.
+
+```
+Usage: glitter init publish [OPTIONS]
+
+Options:
+  -n, --name <NAME>  Name of repo
+  -d, --desc <DESC>  Description of repo
+  -p, --private      Repo visibility
+  -h, --help         Print help
+```
 
 ### `push`
 
@@ -36,6 +67,7 @@ Options:
 ```
 
 **Undo** the last push:
+
 ```
 Usage: glitter push undo [OPTIONS]
 
@@ -44,13 +76,11 @@ Options:
   -h, --help  Print help
 ```
 
-
 ### `commit`
 
 Stage all files and commit.
 
 Accepts the same flags as `push`.
-
 
 ### `add`
 
@@ -62,13 +92,12 @@ Navigate with `j`/`k` or arrow keys, toggle staging with `Space` or `Enter`, and
 Usage: glitter add [OPTIONS] [FILES]...
 
 Arguments:
-  [FILES]...  
+  [FILES]...
 
 Options:
   -r, --revert  Revert
   -h, --help    Print help
 ```
-
 
 ### `pull`
 
@@ -81,7 +110,6 @@ Options:
   -y, --yes   Skip warning
   -h, --help  Print help
 ```
-
 
 ### `open`
 
