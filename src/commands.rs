@@ -1,6 +1,6 @@
 use ::std::process::Command;
 
-/// Run a command print its output
+/// Run a command output to stdout
 pub fn run_command(args: &[&str]) {
     Command::new(args[0])
         .args(&args[1..])
@@ -21,4 +21,15 @@ pub fn run_command_output(args: &[&str]) -> String {
             std::process::exit(1);
         });
     String::from_utf8_lossy(&out.stdout).to_string()
+}
+
+/// Spawn a command
+pub fn spawn_command(args: &[&str]) {
+    Command::new(args[0])
+        .args(&args[1..])
+        .spawn()
+        .unwrap_or_else(|e| {
+            eprintln!("{e}");
+            std::process::exit(1);
+        });
 }

@@ -1,11 +1,11 @@
-use crate::commands::{run_command, run_command_output};
+use crate::commands::{run_command_output, spawn_command};
 
 /// Opens the url in the default browser
 pub fn open(url: &str) {
     match std::env::consts::OS {
-        "windows" => run_command(&["cmd", "/c", "start", url]),
-        "macos" => run_command(&["open", url]),
-        _ => run_command(&["xdg-open", url]),
+        "windows" => spawn_command(&["cmd", "/c", "start", url]),
+        "macos" => spawn_command(&["open", url]),
+        _ => spawn_command(&["xdg-open", url]),
     }
 }
 
