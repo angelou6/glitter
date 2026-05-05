@@ -4,6 +4,8 @@ Opinionated Git shortcuts. Designed to streamline, not replace.
 
 ## Installation
 
+### Linux
+
 On `/usr/local/bin/glitter`
 
 ```bash
@@ -16,9 +18,19 @@ On `~/.local/bin`:
 make local_install
 ```
 
+### Windows / Mac
+
+I don't use either of them, but I assume this will work.
+
+If there are any errors in either of them, PRs are welcome.
+
+```
+cargo install --path .
+```
+
 ## Commands
 
-### `init`
+### init
 
 Initialize git repo
 
@@ -47,7 +59,7 @@ Options:
   -h, --help         Print help
 ```
 
-### `push`
+### push
 
 Stage, push and commit all in one.
 
@@ -66,7 +78,7 @@ Options:
   -h, --help               Print help
 ```
 
-**Undo** the last push:
+`Undo` the last push:
 
 ```
 Usage: glitter push undo [OPTIONS]
@@ -76,13 +88,13 @@ Options:
   -h, --help  Print help
 ```
 
-### `commit`
+### commit
 
 Stage all files and commit.
 
 Accepts the same flags as `push`.
 
-### `add`
+### add
 
 Opens an interactive TUI to stage files. You can also use it as the normal `git add`
 
@@ -99,7 +111,7 @@ Options:
   -h, --help    Print help
 ```
 
-### `pull`
+### pull
 
 Force pull and reset local changes
 
@@ -111,7 +123,7 @@ Options:
   -h, --help  Print help
 ```
 
-### `open`
+### open
 
 Open the repository in the default browser.
 
