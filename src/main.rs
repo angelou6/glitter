@@ -156,7 +156,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let desc = p_args.desc.unwrap_or(String::new());
                     publish::github(name, desc, p_args.private)
                 // } else if let Some((name, desc, private)) = publish::draw() {
-                } else if let Some((_, _, _)) = publish::draw() {
+                } else if let () = publish::draw() {
                     // publish::github(name, desc, private)
                     todo!("human rewrite");
                 }
