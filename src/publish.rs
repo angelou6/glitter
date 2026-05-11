@@ -63,7 +63,7 @@ fn read_text(prompt: &str, required: bool) -> Option<String> {
 
 fn read_visibility() -> Option<bool> {
     let mut out = io::stdout();
-    let mut selected = 0usize;
+    let mut selected: usize = 0;
     let mut first = true;
 
     loop {
