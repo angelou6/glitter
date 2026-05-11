@@ -121,12 +121,15 @@ pub fn undo_commit(hard: bool) {
 
 pub fn undo_push(force: bool, hard: bool) {
     undo_commit(hard);
-    let force = if force {
-        "--force"
-    } else {
-        "--force-with-lease"
-    };
-    run_command(&["git", "push", force]);
+    run_command(&[
+        "git",
+        "push",
+        if force {
+            "--force"
+        } else {
+            "--force-with-lease"
+        },
+    ]);
 }
 
 pub fn revert_stage(files: Vec<String>) {
@@ -147,10 +150,13 @@ pub fn stage_files(files: Vec<String>) {
 
 pub fn init(message: Vec<String>) {
     run_command_output(&["git", "init"]);
-    let message = if message.len() == 0 {
-        vec!["initial commit".to_owned()]
-    } else {
-        message
-    };
-    add_and_commit(message, false, true);
+    add_and_commit(
+        if message.len() == 0 {
+            vec!["initial commit".to_owned()]
+        } else {
+            message
+        },
+        false,
+        true,
+    );
 }
