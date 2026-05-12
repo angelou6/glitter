@@ -5,6 +5,7 @@ mod stage;
 mod url;
 
 use clap::{Args, Parser, Subcommand};
+use crossterm::style::Stylize;
 
 #[derive(Parser)]
 #[command(
@@ -52,9 +53,9 @@ struct InitArgs {
     #[arg(short, long)]
     message: Vec<String>,
 
-    /// Force commit to execute
+    /// Setup a remote
     #[arg(short, long)]
-    force: bool,
+    remote: Option<String>,
 
     #[command(subcommand)]
     publish_command: Option<PublishCommand>,
@@ -150,17 +151,34 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Init(args) => {
             validate_messages(&args.message)?;
             git::init(args.message);
-            if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
-                if !p_args.is_empty() {
-                    let name = p_args.name.unwrap();
-                    let desc = p_args.desc.unwrap_or_default();
-                    publish::github(name, desc, p_args.private)
-                } else {
-                    let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
-                        eprint!("Error: {e}");
-                        std::process::exit(1);
-                    });
-                    publish::github(name, desc, private);
+
+            match args.remote {
+                Some(remote) => {
+                    git::setup_remote(&remote);
+                    if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
+                        if !p_args.is_empty() {
+                            print!("{}", "[Glitter] ".yellow());
+                            println!(
+                                "Arguments for publish will be ignored when remote is declared"
+                            );
+                        }
+                        git::push_to_main();
+                    }
+                }
+                None => {
+                    if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
+                        if !p_args.is_empty() {
+                            let name = p_args.name.unwrap();
+                            let desc = p_args.desc.unwrap_or_default();
+                            publish::github(name, desc, p_args.private)
+                        } else {
+                            let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
+                                eprint!("Error: {e}");
+                                std::process::exit(1);
+                            });
+                            publish::github(name, desc, private);
+                        }
+                    }
                 }
             }
         }
