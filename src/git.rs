@@ -157,7 +157,7 @@ pub fn stage_files(files: Vec<String>) {
 }
 
 pub fn init(message: Vec<String>) {
-    run_command_output(&["git", "init"]);
+    run_command(&["git", "init"]);
     add_and_commit(
         if message.len() == 0 {
             vec!["initial commit".to_owned()]
@@ -167,4 +167,13 @@ pub fn init(message: Vec<String>) {
         false,
         true,
     );
+}
+
+pub fn setup_remote(remote: &str) {
+    run_command(&["git", "branch", "-M", "main"]);
+    run_command(&["git", "remote", "add", "origin", remote]);
+}
+
+pub fn push_to_main() {
+    run_command(&["git", "push", "-u", "origin", "main"]);
 }
