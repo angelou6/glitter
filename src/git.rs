@@ -18,6 +18,14 @@ fn get_staged() -> Vec<String> {
         .collect()
 }
 
+pub fn stage(location: &str) {
+    run_command(&["git", "add", location]);
+}
+
+pub fn unstage(location: &str) {
+    run_command(&["git", "restore", "--staged", location]);
+}
+
 pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) {
     if get_staged().len() == 0 || all {
         run_command(&["git", "add", "."]);

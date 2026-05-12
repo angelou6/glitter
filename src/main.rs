@@ -153,13 +153,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
                 if !p_args.is_empty() {
                     let name = p_args.name.unwrap();
-                    let desc = p_args.desc.unwrap_or(String::new());
+                    let desc = p_args.desc.unwrap_or_default();
                     publish::github(name, desc, p_args.private)
-                // } else if let Some((name, desc, private)) = publish::draw() {
                 } else {
-                    publish::draw();
-                    // publish::github(name, desc, private)
-                    todo!("human rewrite");
+                    let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
+                        eprint!("Error: {e}");
+                        std::process::exit(1);
+                    });
+                    publish::github(name, desc, private);
                 }
             }
         }
@@ -187,8 +188,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     git::stage_files(args.files);
                 }
             } else {
-                let mut interface = stage::Interface::new()?;
-                interface.draw()?;
+                stage::draw().unwrap_or_else(|e| {
+                    eprint!("Error: {e}");
+                    std::process::exit(1);
+                });
             }
         }
         Commands::Pull(args) => git::force_pull(args.yes),
