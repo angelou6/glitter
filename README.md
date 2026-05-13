@@ -6,14 +6,16 @@
 
 ---
 
-`Glitter` is a tool providing some shorcuts that I found useful working in solo projects.
+`Glitter` is a tool that provides some shorcuts that I found useful for solo projects.
 
 ## Why?
+
 Git can be very verbose some times and executing multiple commands just to do one thing gets tiring.
 
 **For example**:
 
 From this:
+
 ```sh
 git add .
 git commit -m "my cool project"
@@ -21,11 +23,13 @@ git push
 ```
 
 To this.
+
 ```sh
 glitter push -m "my cool project"
 ```
 
 Or this:
+
 ```sh
 git init
 git add .
@@ -36,6 +40,7 @@ git push -u origin main
 ```
 
 To this:
+
 ```sh
 glitter init -r https://github.com/angelou6/glitter.git publish
 ```
@@ -44,17 +49,24 @@ glitter init -r https://github.com/angelou6/glitter.git publish
 
 `Glitter` also has some small TUIs to help with publishing and staging:
 
-| Publish                                | Stage                                     |
-| ---                                    | ---                                       |
-|![stage tui](/assets/glitter_stage.png) | ![stage tui](/assets/glitter_publish.png) |
+| Stage                                   | Publish                                   |
+| --------------------------------------- | ----------------------------------------- |
+| ![stage tui](/assets/glitter_stage.png) | ![stage tui](/assets/glitter_publish.png) |
 
-## Usage
-
-This is an example of going from local files to pushing to github and making a commit with fixes using `Glitter`.
+## Example usage
 
 ```sh
 glitter init -m "my cool repo" publish -n glitter
 glitter push -m "fix: it compiles now"
+
+# amending the last push with new stuff
+glitter push --amend
+
+# Removing the lates push from remote
+glitter push undo
+
+# Opening the project in the default browser
+glitter open
 ```
 
 ## Instalation
@@ -77,7 +89,7 @@ make local_install
 
 I don't use either of them, but I assume this will work.
 
-If there are any errors in either of them, PRs are welcome.
+If there are any errors, PRs are welcome.
 
 ```
 cargo install --path .
@@ -85,5 +97,5 @@ cargo install --path .
 
 ## Dependencies
 
-* git
-* github-cli (optional for publishing on github)
+- git
+- github-cli (optional for publishing on github)
