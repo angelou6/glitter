@@ -90,6 +90,10 @@ pub fn amend_push(message: Vec<String>, force: bool) {
     run_command(&["git", "push", force]);
 }
 
+pub fn pull() {
+    run_command(&["git", "pull"]);
+}
+
 pub fn force_pull(skip: bool) {
     if !skip {
         let mut input = String::new();
