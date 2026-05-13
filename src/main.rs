@@ -122,6 +122,10 @@ struct AddArgs {
 
 #[derive(Args)]
 struct PullArgs {
+    /// Force pull
+    #[arg(short, long)]
+    force: bool,
+
     /// Skip warning
     #[arg(short, long)]
     yes: bool,
@@ -212,7 +216,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
             }
         }
-        Commands::Pull(args) => git::force_pull(args.yes),
+        Commands::Pull(args) => {
+            if args.force {
+                git::force_pull(args.yes)
+            } else {
+                git::pull();
+            }
+        }
         Commands::Open(args) => {
             let remote = url::get_project_url();
             match args.commit {
