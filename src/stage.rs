@@ -4,7 +4,7 @@ use crate::{commands, git};
 use crossterm::event::{self, Event, KeyCode};
 use crossterm::execute;
 use crossterm::style::{Color, Print, ResetColor, SetForegroundColor};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
+use crossterm::terminal::{Clear, ClearType, disable_raw_mode, enable_raw_mode};
 use crossterm::{cursor, queue};
 
 struct File {
@@ -58,6 +58,7 @@ fn draw_stage_selection() -> io::Result<()> {
         for (i, op) in options.iter().enumerate() {
             queue!(
                 stdout,
+                Clear(ClearType::CurrentLine),
                 SetForegroundColor(Color::Blue),
                 Print(if i == pointer { "> " } else { "  " }),
                 if op.is_tracked {
