@@ -5,7 +5,6 @@ mod stage;
 mod url;
 
 use clap::{Args, Parser, Subcommand};
-use crossterm::style::Stylize;
 
 #[derive(Parser)]
 #[command(
@@ -143,10 +142,7 @@ struct OpenArgs {
 
 fn validate_messages(messages: &Vec<String>) -> Result<(), String> {
     if messages.len() > 2 {
-        Err(format!(
-            "{} You can only have a name and description.",
-            "[Glitter]".red()
-        ))
+        Err(String::from("You can only have a name and description."))
     } else {
         Ok(())
     }
@@ -164,10 +160,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     git::setup_remote(&remote);
                     if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
                         if !p_args.is_empty() {
-                            print!("{}", "[Glitter] ".yellow());
-                            println!(
-                                "Arguments for publish will be ignored when remote is declared"
-                            );
+                            println!("Arguments for publish ignored");
                         }
                         git::push_to_main();
                     }
@@ -180,7 +173,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             publish::github(name, desc, p_args.private)
                         } else {
                             let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
-                                eprint!("{} Error: {e}", "[Glitter]".red());
+                                eprint!("Error: {e}");
                                 std::process::exit(1);
                             });
                             publish::github(name, desc, private);
@@ -214,7 +207,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             } else {
                 stage::draw().unwrap_or_else(|e| {
-                    eprint!("{} Error: {e}", "[Glitter]".red());
+                    eprint!("Error: {e}");
                     std::process::exit(1);
                 });
             }
