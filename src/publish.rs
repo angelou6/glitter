@@ -1,3 +1,4 @@
+use crossterm::style::Stylize;
 use std::env;
 use std::io::{self, Write};
 
@@ -46,9 +47,9 @@ fn draw_input(label: &str, default: &str) -> io::Result<String> {
     let custom_label = format!(
         "{label}{}: ",
         if default.is_empty() {
-            String::new()
+            String::from(" (optional)").grey()
         } else {
-            format!(", (default: {default})")
+            format!(" (default: {default})").grey()
         }
     );
 
@@ -66,7 +67,15 @@ fn draw_input(label: &str, default: &str) -> io::Result<String> {
                     return Err(io::Error::new(io::ErrorKind::Other, "Keyboard Interrupt"));
                 }
                 (KeyCode::Enter, _) => {
-                    execute!(io::stdout(), Print("\r\n"))?;
+                    execute!(
+                        stdout,
+                        Print(if !default.is_empty() {
+                            default
+                        } else {
+                            "(empty)"
+                        }),
+                        Print("\r\n")
+                    )?;
                     return Ok(String::from(if input.is_empty() {
                         default
                     } else {
@@ -182,8 +191,9 @@ pub fn draw() -> io::Result<(String, String, bool)> {
     enable_raw_mode()?;
 
     let name = draw_input("Name", &cwd)?;
-    let desc = draw_input("Desc", "")?;
+    let desc = draw_input("Description", "")?;
 
+    execute!(io::stdout(), Print("Visibility:"), Print("\r\n"))?;
     let is_private = draw_visibility_selection()?;
 
     disable_raw_mode()?;

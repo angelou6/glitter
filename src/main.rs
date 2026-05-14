@@ -143,7 +143,10 @@ struct OpenArgs {
 
 fn validate_messages(messages: &Vec<String>) -> Result<(), String> {
     if messages.len() > 2 {
-        Err(String::from("You can only have a name and description."))
+        Err(format!(
+            "{} You can only have a name and description.",
+            "[Glitter]".red()
+        ))
     } else {
         Ok(())
     }
@@ -177,7 +180,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             publish::github(name, desc, p_args.private)
                         } else {
                             let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
-                                eprint!("Error: {e}");
+                                eprint!("{} Error: {e}", "[Glitter]".red());
                                 std::process::exit(1);
                             });
                             publish::github(name, desc, private);
@@ -211,7 +214,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             } else {
                 stage::draw().unwrap_or_else(|e| {
-                    eprint!("Error: {e}");
+                    eprint!("{} Error: {e}", "[Glitter]".red());
                     std::process::exit(1);
                 });
             }
