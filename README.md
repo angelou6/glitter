@@ -73,7 +73,7 @@ glitter open
 
 ### Linux
 
-On `/usr/local/bin/glitter`
+On `/usr/local/bin/`
 
 ```bash
 sudo make install

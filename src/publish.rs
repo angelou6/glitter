@@ -1,11 +1,10 @@
-use crossterm::style::Stylize;
 use std::env;
 use std::io::{self, Write};
 
 use crate::commands::run_command;
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use crossterm::style::{Color, Print, ResetColor, SetForegroundColor};
-use crossterm::terminal::{self, ClearType, disable_raw_mode, enable_raw_mode};
+use crossterm::terminal::{self, Clear, ClearType, disable_raw_mode, enable_raw_mode};
 use crossterm::{cursor, execute, queue};
 
 // Maybe at some point add forgejo/codeberg support if I ever move there
@@ -25,38 +24,48 @@ pub fn github(name: String, description: String, private: bool) {
     ]);
 }
 
-fn print_label(stdout: &mut io::Stdout, label: &str, input: &str) -> io::Result<()> {
-    execute!(
-        stdout,
-        cursor::MoveToColumn(0),
-        terminal::Clear(ClearType::CurrentLine),
-        Print(label),
-        Print(input)
-    )
+fn pop_until_space(input: &mut String, pointer: &mut usize) {
+    let trimmed = input.trim_end();
+
+    if let Some(index) = trimmed.rfind(' ') {
+        input.truncate(index + 1);
+        *pointer = index + 1;
+    } else {
+        input.clear();
+        *pointer = 0;
+    }
 }
 
-fn pop_until_space(input: &mut String, pointer: &mut usize) {
-    while !input.ends_with(' ') && input.len() > 0 {
-        input.pop();
-        *pointer -= 1;
-    }
+/// Only update the user input instead of redrawing the whole line
+fn print_user_input(stdout: &mut io::Stdout, input: &str, offset: u16) -> io::Result<()> {
+    execute!(
+        stdout,
+        cursor::MoveToColumn(offset),
+        Clear(ClearType::UntilNewLine),
+        Print(input)
+    )?;
+    Ok(())
 }
 
 fn draw_input(label: &str, default: &str) -> io::Result<String> {
     let mut stdout = io::stdout();
-    let custom_label = format!(
-        "{label}{}: ",
-        if default.is_empty() {
-            String::from(" (optional)").grey()
-        } else {
-            format!(" (default: {default})").grey()
-        }
-    );
-
     let mut input = String::new();
     let mut pointer: usize = 0;
 
-    print_label(&mut stdout, &custom_label, &input)?;
+    execute!(
+        stdout,
+        terminal::Clear(ClearType::CurrentLine),
+        Print(label),
+        SetForegroundColor(Color::Grey),
+        Print(if default.is_empty() {
+            String::from(" (optional)")
+        } else {
+            format!(" (default: {default})")
+        }),
+        ResetColor,
+        Print(": ")
+    )?;
+    let (offset, _) = cursor::position()?;
 
     loop {
         if let Event::Key(key) = event::read()? {
@@ -67,20 +76,19 @@ fn draw_input(label: &str, default: &str) -> io::Result<String> {
                     return Err(io::Error::new(io::ErrorKind::Other, "Keyboard Interrupt"));
                 }
                 (KeyCode::Enter, _) => {
-                    execute!(
-                        stdout,
-                        Print(if !default.is_empty() {
-                            default
-                        } else {
-                            "(empty)"
-                        }),
-                        Print("\r\n")
-                    )?;
-                    return Ok(String::from(if input.is_empty() {
-                        default
-                    } else {
-                        &input
-                    }));
+                    if input.is_empty() {
+                        execute!(
+                            stdout,
+                            if !default.is_empty() {
+                                Print(default)
+                            } else {
+                                Print("(empty)")
+                            }
+                        )?;
+                    }
+                    execute!(stdout, Print("\r\n"))?;
+
+                    return Ok(if input.is_empty() { default } else { &input }.to_owned());
                 }
                 (KeyCode::Backspace, modifier) => {
                     if input.len() == 0 {
@@ -88,23 +96,18 @@ fn draw_input(label: &str, default: &str) -> io::Result<String> {
                     }
 
                     if modifier == KeyModifiers::ALT {
-                        input.pop();
                         pop_until_space(&mut input, &mut pointer);
                     } else {
                         input.pop();
+                        pointer -= 1;
                     }
-                    pointer -= 1;
-                    print_label(&mut stdout, &custom_label, &input)?;
+                    print_user_input(&mut stdout, &input, offset)?;
                 }
                 (KeyCode::Char('e'), KeyModifiers::CONTROL) => {
-                    let (_, row) = cursor::position()?;
-                    execute!(
-                        stdout,
-                        cursor::MoveTo((custom_label.len() + input.len()) as u16, row)
-                    )?;
+                    execute!(stdout, cursor::MoveToColumn(offset + input.len() as u16))?;
                 }
                 (KeyCode::Char('a'), KeyModifiers::CONTROL) => {
-                    execute!(stdout, cursor::MoveToColumn(custom_label.len() as u16))?;
+                    execute!(stdout, cursor::MoveToColumn(offset))?;
                 }
                 (KeyCode::Left, _) => {
                     if pointer - 1 > 0 {
@@ -122,7 +125,7 @@ fn draw_input(label: &str, default: &str) -> io::Result<String> {
                     if let Some(c) = other.0.as_char() {
                         input.insert(pointer, c);
                         pointer += 1;
-                        print_label(&mut stdout, &custom_label, &input)?;
+                        print_user_input(&mut stdout, &input, offset)?;
                     }
                 }
             }
@@ -158,23 +161,33 @@ fn draw_visibility_selection() -> io::Result<bool> {
         stdout.flush()?;
 
         if let Event::Key(key) = event::read()? {
-            match key.code {
-                KeyCode::Char('q') => {
+            match (key.code, key.modifiers) {
+                (KeyCode::Char('c'), KeyModifiers::CONTROL)
+                | (KeyCode::Char('d'), KeyModifiers::CONTROL) => {
                     execute!(stdout, cursor::RestorePosition, cursor::Show)?;
                     disable_raw_mode()?;
                     return Err(io::Error::new(io::ErrorKind::Other, "Keyboard Interrupt"));
                 }
-                KeyCode::Down => {
-                    if pointer + 1 < options.len() {
-                        pointer += 1;
+                (KeyCode::Char('q'), _) | (KeyCode::Esc, _) => {
+                    execute!(stdout, cursor::RestorePosition, cursor::Show)?;
+                    disable_raw_mode()?;
+                    return Err(io::Error::new(io::ErrorKind::Other, "Keyboard Interrupt"));
+                }
+                (KeyCode::Down, _) => {
+                    pointer = if pointer + 1 < options.len() {
+                        pointer + 1
+                    } else {
+                        0
                     }
                 }
-                KeyCode::Up => {
-                    if pointer > 0 {
-                        pointer -= 1;
+                (KeyCode::Up, _) => {
+                    pointer = if pointer > 0 {
+                        pointer - 1
+                    } else {
+                        options.len() - 1
                     }
                 }
-                KeyCode::Enter => {
+                (KeyCode::Enter, _) => {
                     execute!(stdout, cursor::RestorePosition, cursor::Show)?;
                     return Ok(pointer == 0);
                 }
