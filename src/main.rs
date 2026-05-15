@@ -28,7 +28,7 @@ enum Commands {
     Commit(CommitPushArgs),
     /// Stage files
     Add(AddArgs),
-    ///  Force pull and reset local changes
+    /// Pull and reset local changes
     Pull(PullArgs),
     /// Open the repository in the default web browser
     Open(OpenArgs),
@@ -42,7 +42,7 @@ enum UndoCommads {
 
 #[derive(Subcommand)]
 enum PublishCommand {
-    /// Publish online, public by default
+    /// Publish online
     Publish(PublishArgs),
 }
 
@@ -86,6 +86,10 @@ struct UndoArgs {
     /// Undo hard
     #[arg(long)]
     hard: bool,
+
+    // Revert to this commit
+    #[clap(default_value = "HEAD~")]
+    commit: String,
 }
 
 #[derive(Args)]
@@ -140,19 +144,10 @@ struct OpenArgs {
     dump: bool,
 }
 
-fn validate_messages(messages: &Vec<String>) -> Result<(), String> {
-    if messages.len() > 2 {
-        Err(String::from("You can only have a name and description."))
-    } else {
-        Ok(())
-    }
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     match cli.command {
         Commands::Init(args) => {
-            validate_messages(&args.message)?;
             git::init(args.message);
 
             match args.remote {
@@ -182,22 +177,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
-        Commands::Push(args) => {
-            validate_messages(&args.message)?;
-            match args.undo_command {
-                Some(UndoCommads::Undo(undo_args)) => git::undo_push(args.force, undo_args.hard),
-                None if args.amend => git::amend_push(args.message, args.force),
-                None => git::push(args.message, args.force, args.all),
+        Commands::Push(args) => match args.undo_command {
+            Some(UndoCommads::Undo(undo_args)) => {
+                git::undo_push(args.force, undo_args.hard, undo_args.commit)
             }
-        }
-        Commands::Commit(args) => {
-            validate_messages(&args.message)?;
-            match args.undo_command {
-                Some(UndoCommads::Undo(undo_args)) => git::undo_commit(undo_args.hard),
-                None if args.amend => git::amend_commit(args.message),
-                None => git::add_and_commit(args.message, args.force, args.all),
+            None if args.amend => git::amend_push(args.message, args.force),
+            None => git::push(args.message, args.force, args.all),
+        },
+        Commands::Commit(args) => match args.undo_command {
+            Some(UndoCommads::Undo(undo_args)) => {
+                git::undo_commit(undo_args.hard, undo_args.commit)
             }
-        }
+            None if args.amend => git::amend_commit(args.message),
+            None => git::add_and_commit(args.message, args.force, args.all),
+        },
         Commands::Add(args) => {
             if args.files.len() > 0 {
                 if args.revert {
