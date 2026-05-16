@@ -66,7 +66,7 @@ pub fn amend_commit(message: Vec<String>) {
     if message.len() == 0 {
         run_command(&["git", "commit", "--amend", "--no-edit"]);
     } else {
-        let mut args = vec!["git", "commit"];
+        let mut args = vec!["git", "commit", "--amend"];
         let mut messages = git_messages(&message);
         args.append(&mut messages);
         run_command(&args);
@@ -165,7 +165,7 @@ pub fn stage_files(files: Vec<String>) {
     run_command(&args);
 }
 
-pub fn init(message: Vec<String>) {
+pub fn init(message: Vec<String>, branch: String) {
     run_command(&["git", "init"]);
     add_and_commit(
         if message.len() == 0 {
@@ -176,10 +176,10 @@ pub fn init(message: Vec<String>) {
         false,
         true,
     );
+    run_command(&["git", "branch", "-M", &branch]);
 }
 
-pub fn setup_remote(remote: &str) {
-    run_command(&["git", "branch", "-M", "main"]);
+pub fn setup_origin(remote: &str) {
     run_command(&["git", "remote", "add", "origin", remote]);
 }
 

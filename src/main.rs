@@ -52,9 +52,14 @@ struct InitArgs {
     #[arg(short, long)]
     message: Vec<String>,
 
-    /// Setup a remote
+    /// Declare origin
     #[arg(short, long)]
-    remote: Option<String>,
+    origin: Option<String>,
+
+    #[arg(short, long)]
+    #[clap(default_value = "main")]
+    /// Declare branch
+    branch: String,
 
     #[command(subcommand)]
     publish_command: Option<PublishCommand>,
@@ -148,11 +153,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     match cli.command {
         Commands::Init(args) => {
-            git::init(args.message);
+            git::init(args.message, args.branch);
 
-            match args.remote {
-                Some(remote) => {
-                    git::setup_remote(&remote);
+            match args.origin {
+                Some(origin) => {
+                    git::setup_origin(&origin);
                     if let Some(PublishCommand::Publish(p_args)) = args.publish_command {
                         if !p_args.is_empty() {
                             println!("Arguments for publish ignored");
