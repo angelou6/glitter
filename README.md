@@ -1,7 +1,7 @@
 # ✨ Glitter
 
 <p align="center">
-  <img src="https://github.com/angelou6/glitter/blob/master/assets/glitter_logo.png?raw=true" alt="Sublime's custom image"/>
+  <img src="https://github.com/angelou6/glitter/blob/main/assets/glitter_logo.png?raw=true" alt="glitter logo"/>
 </p>
 
 ---
@@ -42,7 +42,7 @@ git push -u origin main
 To this:
 
 ```sh
-glitter init -r https://github.com/angelou6/glitter.git publish
+glitter init -o https://github.com/angelou6/glitter.git publish
 ```
 
 ---
