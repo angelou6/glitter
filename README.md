@@ -80,14 +80,20 @@ glitter open
 
 On `/usr/local/bin/`
 
-```bash
+```sh
 sudo make install
 ```
 
 On `~/.local/bin`:
 
-```bash
-make local_install
+```sh
+make install PREFIX=~/.local
+```
+
+You can also change the name of the binary like this:
+
+```sh
+sudo make install BINNAME=glt
 ```
 
 ### Windows / Mac

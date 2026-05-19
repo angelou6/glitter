@@ -1,12 +1,14 @@
-.PHONY: build install local_install
+.PHONY: build install uninstall
 
 BIN = target/release/glitter
+PREFIX ?= /usr/local
+BINNAME ?= glitter
 
 build:
 	cargo build --release
 
 install: build
-	install -Dm755 $(BIN) /usr/local/bin/glitter
+	install -Dm755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
 
-local_install: build
-	install -Dm755 $(BIN) ~/.local/bin/glitter
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
