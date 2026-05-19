@@ -42,7 +42,8 @@ git push -u origin main
 To this:
 
 ```sh
-glitter init -o https://github.com/angelou6/glitter.git publish
+glitter init
+glitter publish -o https://github.com/angelou6/glitter.git
 ```
 
 ---
@@ -56,14 +57,18 @@ glitter init -o https://github.com/angelou6/glitter.git publish
 ## Example usage
 
 ```sh
-glitter init -m "my cool repo" publish -n glitter
+# Initializing the repository and pushing it to GitHub
+glitter init -m "my cool repo"
+glitter publish -n glitter
+
+# Pushing a fix
 glitter push -m "fix: it compiles now"
 
-# amending the last push with new stuff
+# Amending the last push with new stuff
 glitter push --amend
 
 # Removing the lates push from remote
-glitter push undo
+glitter undo push
 
 # Opening the project in the default browser
 glitter open

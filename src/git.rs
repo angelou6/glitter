@@ -1,22 +1,12 @@
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    path::Path,
+};
 
-use crate::commands::{run_command, run_command_output};
-
-fn get_staged() -> Vec<String> {
-    let changed = run_command_output(&["git", "diff", "--name-only", "--staged"]);
-    let changed = changed.trim();
-    changed
-        .trim()
-        .split('\n')
-        .filter_map(|s| {
-            if s.is_empty() {
-                None
-            } else {
-                Some(s.to_string())
-            }
-        })
-        .collect()
-}
+use crate::{
+    commands::{run_command, run_command_output},
+    stage,
+};
 
 pub fn stage(location: &str) {
     run_command(&["git", "add", location]);
@@ -37,20 +27,23 @@ fn git_messages(messages: &[String]) -> Vec<&str> {
     res
 }
 
-pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) {
-    if get_staged().len() == 0 || all {
+pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
+    let status = stage::get_simple_status();
+
+    if status.staged.is_empty() && status.unstaged.is_empty() {
+        return Err(String::from("Nothing to commit"));
+    } else if status.staged.is_empty() || all {
         run_command(&["git", "add", "."]);
     }
 
-    if message.len() == 0 && force {
-        let files = get_staged();
-        let count = files.len();
+    if message.is_empty() && force {
+        let count = status.staged.len();
         let msg = format!(
             "Changed {} file{}",
             count,
             if count == 1 { "" } else { "s" }
         );
-        let list_str = format!("Files changed: {}", files.join(", "));
+        let list_str = format!("Files changed: {}", status.staged.join(", "));
         run_command(&["git", "commit", "-m", &msg, "-m", &list_str]);
     } else {
         let mut args = vec!["git", "commit"];
@@ -58,6 +51,8 @@ pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) {
         args.append(&mut messages);
         run_command(&args);
     }
+
+    Ok(())
 }
 
 pub fn amend_commit(message: Vec<String>) {
@@ -73,13 +68,14 @@ pub fn amend_commit(message: Vec<String>) {
     }
 }
 
-pub fn push(message: Vec<String>, force: bool, all: bool) {
-    add_and_commit(message, force, all);
+pub fn push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
+    add_and_commit(message, force, all).unwrap_or_else(|e| eprintln!("{e}"));
     run_command(if force {
         &["git", "push", "--force"]
     } else {
         &["git", "push"]
     });
+    Ok(())
 }
 
 pub fn amend_push(message: Vec<String>, force: bool) {
@@ -136,17 +132,9 @@ pub fn undo_commit(hard: bool, commit: String) {
     }
 }
 
-pub fn undo_push(force: bool, hard: bool, commit: String) {
+pub fn undo_push(hard: bool, commit: String) {
     undo_commit(hard, commit);
-    run_command(&[
-        "git",
-        "push",
-        if force {
-            "--force"
-        } else {
-            "--force-with-lease"
-        },
-    ]);
+    run_command(&["git", "push", "--force-with-lease"]);
 }
 
 pub fn revert_stage(files: Vec<String>) {
@@ -165,24 +153,30 @@ pub fn stage_files(files: Vec<String>) {
     run_command(&args);
 }
 
-pub fn init(message: Vec<String>, branch: String) {
-    run_command(&["git", "init"]);
-    add_and_commit(
-        if message.len() == 0 {
-            vec!["initial commit".to_owned()]
-        } else {
-            message
-        },
-        false,
-        true,
-    );
-    run_command(&["git", "branch", "-M", &branch]);
+pub fn init(messages: Vec<String>, branch: String) -> Result<(), String> {
+    if Path::new(".git").is_dir() {
+        Err(String::from("This directory has already been initialized"))
+    } else {
+        run_command(&["git", "init"]);
+        run_command(&["git", "branch", "-M", &branch]);
+        add_and_commit(
+            if messages.is_empty() {
+                vec!["initial commit".to_owned()]
+            } else {
+                messages
+            },
+            false, // Don't force
+            true,  // Stage all files
+        )?;
+        Ok(())
+    }
 }
 
 pub fn setup_origin(remote: &str) {
     run_command(&["git", "remote", "add", "origin", remote]);
 }
 
-pub fn push_to_main() {
-    run_command(&["git", "push", "-u", "origin", "main"]);
+pub fn push_to_origin() {
+    let branch = run_command_output(&["git", "branch", "--show-current"]);
+    run_command(&["git", "push", "-u", "origin", &branch]);
 }

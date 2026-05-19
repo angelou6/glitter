@@ -13,6 +13,11 @@ struct File {
     is_tracked: bool,
 }
 
+pub struct Status {
+    pub staged: Vec<String>,
+    pub unstaged: Vec<String>,
+}
+
 impl File {
     fn toggle_stage(&mut self) {
         if self.is_tracked {
@@ -24,8 +29,8 @@ impl File {
     }
 }
 
-fn parse_porcelain() -> Vec<File> {
-    let status = commands::run_command_output(&["git", "status", "--porcelain"]);
+fn parse_status() -> Vec<File> {
+    let status = commands::run_command_output(&["git", "status", "--porcelain", "-uall"]);
     let status: Vec<&str> = status.trim_end().split('\n').collect();
 
     let mut files: Vec<File> = vec![];
@@ -43,6 +48,16 @@ fn parse_porcelain() -> Vec<File> {
     files
 }
 
+pub fn get_simple_status() -> Status {
+    let status = parse_status();
+    let (staged, unstaged): (Vec<_>, Vec<_>) = status.iter().partition(|f| f.is_tracked);
+
+    Status {
+        staged: staged.into_iter().map(|f| f.path.clone()).collect(),
+        unstaged: unstaged.into_iter().map(|f| f.path.clone()).collect(),
+    }
+}
+
 fn draw_stage_selection() -> io::Result<()> {
     let mut stdout = io::stdout();
     let mut pointer: usize = 0;
@@ -50,7 +65,7 @@ fn draw_stage_selection() -> io::Result<()> {
     execute!(stdout, cursor::Hide)?;
 
     loop {
-        let mut options = parse_porcelain();
+        let mut options = parse_status();
         if options.len() == 0 {
             return Err(io::Error::new(io::ErrorKind::Other, "No Files to stage"));
         }
