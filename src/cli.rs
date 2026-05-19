@@ -16,16 +16,27 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Stage, commit, and push changes
-    Push(subcommands::commit_push::Arguments),
     /// Initialize a git repo
     Init(subcommands::init::Arguments),
+
+    /// Publish to github or origin
+    Publish(subcommands::publish::Arguments),
+
     /// Stage all files and commit
     Commit(subcommands::commit_push::Arguments),
+
+    /// Stage, commit, and push changes
+    Push(subcommands::commit_push::Arguments),
+
+    /// Undo an action
+    Undo(subcommands::undo::Arguments),
+
     /// Stage files
     Add(subcommands::small_commands::AddArgs),
+
     /// Pull and reset local changes
     Pull(subcommands::small_commands::PullArgs),
+
     /// Open the repository in the default web browser
     Open(subcommands::small_commands::OpenArgs),
 }

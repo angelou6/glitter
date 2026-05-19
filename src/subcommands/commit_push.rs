@@ -1,7 +1,5 @@
 use clap::Args;
 
-use crate::subcommands::undo::Undo;
-
 #[derive(Args)]
 pub struct Arguments {
     /// Commit message
@@ -19,7 +17,4 @@ pub struct Arguments {
     /// Ignore staged files and stage all
     #[arg(short, long)]
     pub all: bool,
-
-    #[command(subcommand)]
-    pub undo_command: Option<Undo>,
 }
