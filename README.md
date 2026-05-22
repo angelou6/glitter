@@ -1,7 +1,7 @@
 # ✨ Glitter
 
 <p align="center">
-  <img src="https://github.com/angelou6/glitter/blob/main/assets/glitter_logo.png?raw=true" alt="glitter logo"/>
+  <img src="https://github.com/angelou6/glitter/blob/main/assets/logo.png?raw=true" alt="glitter logo"/>
 </p>
 
 ---
@@ -50,9 +50,9 @@ glitter publish -o https://github.com/angelou6/glitter.git
 
 `Glitter` also has some small TUIs to help with publishing and staging:
 
-| Stage                                   | Publish                                   |
-| --------------------------------------- | ----------------------------------------- |
-| ![stage tui](/assets/glitter_stage.png) | ![stage tui](/assets/glitter_publish.png) |
+| Stage                           | Publish                           |
+| ------------------------------- | --------------------------------- |
+| ![stage tui](/assets/stage.png) | ![stage tui](/assets/publish.png) |
 
 ## Example usage
 
