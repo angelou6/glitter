@@ -1,4 +1,5 @@
 use ::std::process::Command;
+use std::io::ErrorKind;
 
 /// Run a command output to stdout
 pub fn run_command(args: &[&str]) {
@@ -32,4 +33,14 @@ pub fn spawn_command(args: &[&str]) {
             eprintln!("{e}");
             std::process::exit(1);
         });
+}
+
+pub fn command_exists(cmd: &str) -> bool {
+    match Command::new(cmd).spawn() {
+        Ok(mut child) => {
+            let _ = child.kill();
+            true
+        }
+        Err(e) => e.kind() != ErrorKind::NotFound,
+    }
 }
