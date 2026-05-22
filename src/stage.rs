@@ -1,16 +1,12 @@
-use std::io::{self, Write};
+use crate::{commands, git, tui::select};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
+use std::io;
+use std::vec;
 
-use crate::{commands, git};
-use crossterm::event::{self, Event, KeyCode};
-use crossterm::execute;
-use crossterm::style::{Color, Print, ResetColor, SetForegroundColor};
-use crossterm::terminal::{Clear, ClearType, disable_raw_mode, enable_raw_mode};
-use crossterm::{cursor, queue};
-
-struct File {
-    path: String,
-    full_str: String,
-    is_tracked: bool,
+pub struct File {
+    pub path: String,
+    pub full_str: String,
+    pub is_tracked: bool,
 }
 
 pub struct Status {
@@ -19,7 +15,7 @@ pub struct Status {
 }
 
 impl File {
-    fn toggle_stage(&mut self) {
+    fn toggle(&mut self) {
         if self.is_tracked {
             git::unstage(&self.path);
         } else {
@@ -59,68 +55,32 @@ pub fn get_simple_status() -> Status {
 }
 
 fn draw_stage_selection() -> io::Result<()> {
-    let mut stdout = io::stdout();
-    let mut pointer: usize = 0;
-
-    execute!(stdout, cursor::Hide)?;
+    let mut selector: select::Selector<File> = select::new(vec![]);
 
     loop {
-        let mut options = parse_status();
-        if options.len() == 0 {
+        selector.options = parse_status();
+        if selector.options.is_empty() {
             return Err(io::Error::new(io::ErrorKind::Other, "No Files to stage"));
         }
 
-        for (i, op) in options.iter().enumerate() {
-            queue!(
-                stdout,
-                Clear(ClearType::CurrentLine),
-                SetForegroundColor(Color::Blue),
-                Print(if i == pointer { "> " } else { "  " }),
-                if op.is_tracked {
-                    SetForegroundColor(Color::Green)
-                } else {
-                    SetForegroundColor(Color::Red)
-                },
-                Print(&op.full_str),
-                ResetColor,
-                Print("\r\n"),
-            )?;
-        }
-        queue!(
-            stdout,
-            cursor::SavePosition,
-            cursor::MoveToPreviousLine(options.len() as u16)
-        )?;
-        stdout.flush()?;
-
-        if let Event::Key(key) = event::read()? {
-            match key.code {
-                KeyCode::Char('q') | KeyCode::Esc => {
-                    execute!(stdout, cursor::RestorePosition, cursor::Show)?;
-                    return Ok(());
-                }
-                KeyCode::Char('a') => {
-                    for mut file in options {
-                        file.toggle_stage();
-                    }
-                }
-                KeyCode::Down | KeyCode::Char('j') => {
-                    if pointer + 1 < options.len() {
-                        pointer += 1;
-                    }
-                }
-                KeyCode::Up | KeyCode::Char('k') => {
-                    if pointer > 0 {
-                        pointer -= 1;
-                    }
-                }
-                KeyCode::Enter | KeyCode::Char(' ') => {
-                    if let Some(file) = options.get_mut(pointer) {
-                        file.toggle_stage();
-                    }
-                }
-                _ => {}
+        match selector.draw()? {
+            Some(select::SelectVal::KeyboardInterrupt) => {
+                return Err(io::Error::new(io::ErrorKind::Other, "Keyboard Interrupt"));
             }
+            Some(select::SelectVal::Quit) => {
+                return Ok(());
+            }
+            Some(select::SelectVal::All) => {
+                for file in selector.options.iter_mut() {
+                    file.toggle();
+                }
+            }
+            Some(select::SelectVal::Select) => {
+                if let Some(file) = selector.options.get_mut(selector.pointer) {
+                    file.toggle();
+                }
+            }
+            _ => {}
         }
     }
 }

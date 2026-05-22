@@ -4,6 +4,7 @@ mod git;
 mod publish;
 mod stage;
 mod subcommands;
+mod tui;
 mod url;
 
 use crate::{cli::Commands, subcommands::undo};
@@ -21,6 +22,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 git::push_to_origin();
             }
             None => {
+                if !commands::command_exists("gh") {
+                    eprint!("Error: github-cli not found.");
+                    std::process::exit(1);
+                }
+
                 if !args.is_empty() {
                     let name = args.name.unwrap();
                     let desc = args.desc.unwrap_or_default();
@@ -53,17 +59,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             undo::UndoTarget::Push => git::undo_push(args.hard, args.commit),
         },
         Commands::Add(args) => {
-            if args.files.len() > 0 {
-                if args.revert {
-                    git::revert_stage(args.files);
-                } else {
-                    git::stage_files(args.files);
-                }
-            } else {
+            if args.files.is_empty() && args.revert {
+                eprint!("Error: No files to revert");
+                std::process::exit(1);
+            } else if args.files.is_empty() {
                 stage::draw().unwrap_or_else(|e| {
                     eprint!("Error: {e}");
                     std::process::exit(1);
                 });
+            } else if args.revert {
+                git::revert_stage(args.files);
+            } else {
+                git::stage_files(args.files);
             }
         }
         Commands::Pull(args) => {

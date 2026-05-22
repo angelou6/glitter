@@ -161,7 +161,7 @@ pub fn init(messages: Vec<String>, branch: String) -> Result<(), String> {
         run_command(&["git", "branch", "-M", &branch]);
         add_and_commit(
             if messages.is_empty() {
-                vec!["initial commit".to_owned()]
+                vec!["initial commit".into()]
             } else {
                 messages
             },
