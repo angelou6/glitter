@@ -6,7 +6,7 @@ pub struct AddArgs {
     /// Files to be staged
     pub files: Vec<String>,
 
-    /// Revert
+    /// Revert staged files
     #[arg(short, long)]
     pub revert: bool,
 }
@@ -17,7 +17,7 @@ pub struct PullArgs {
     #[arg(short, long)]
     pub force: bool,
 
-    /// Skip warning
+    /// Skip force pull warning
     #[arg(short, long)]
     pub yes: bool,
 }
