@@ -2,7 +2,7 @@ use clap::Args;
 
 #[derive(Args)]
 pub struct Arguments {
-    /// Commit message
+    /// Commit messages
     #[arg(short, long)]
     pub message: Vec<String>,
 

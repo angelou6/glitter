@@ -8,10 +8,10 @@ pub enum UndoTarget {
 
 #[derive(Args)]
 pub struct Arguments {
-    /// Target of the undo
+    /// Target of undo command
     pub action: UndoTarget,
 
-    /// Undo hard
+    /// Also undo changes locally
     #[arg(long)]
     pub hard: bool,
 

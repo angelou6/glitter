@@ -2,19 +2,19 @@ use clap::Args;
 
 #[derive(Args)]
 pub struct Arguments {
-    /// Name of repo
+    /// Name of repository
     #[arg(short, long)]
     pub name: Option<String>,
 
-    /// Description of repo
+    /// Description of repository
     #[arg(short, long)]
     pub desc: Option<String>,
 
-    /// Repo visibility
+    /// Set repository visibility to private
     #[arg(short, long)]
     pub private: bool,
 
-    /// Push to origin instead
+    /// Push to origin instead of using github-cli
     #[arg(short, long)]
     pub origin: Option<String>,
 }
