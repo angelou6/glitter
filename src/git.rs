@@ -178,5 +178,5 @@ pub fn setup_origin(remote: &str) {
 
 pub fn push_to_origin() {
     let branch = run_command_output(&["git", "branch", "--show-current"]);
-    run_command(&["git", "push", "-u", "origin", &branch]);
+    run_command(&["git", "push", "-u", "origin", &branch.trim()]);
 }
