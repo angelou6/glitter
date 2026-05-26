@@ -91,6 +91,14 @@ impl<T: DrawOption> Selector<T> {
         Ok(())
     }
 
+    pub fn move_down(&mut self) {
+        self.pointer = (self.pointer + 1) % self.options.len()
+    }
+
+    pub fn move_up(&mut self) {
+        self.pointer = (self.pointer - 1) % self.options.len()
+    }
+
     pub fn draw(&mut self) -> io::Result<Option<SelectVal>> {
         execute!(self.stdout, cursor::Hide)?;
         self.draw_options()?;
@@ -107,8 +115,8 @@ impl<T: DrawOption> Selector<T> {
                 (KeyCode::Char('a'), _) => {
                     return Ok(Some(SelectVal::All));
                 }
-                (KeyCode::Down, _) => self.pointer = (self.pointer + 1) % self.options.len(),
-                (KeyCode::Up, _) => self.pointer = (self.pointer - 1) % self.options.len(),
+                (KeyCode::Down, _) => self.move_down(),
+                (KeyCode::Up, _) => self.move_up(),
                 (KeyCode::Enter, _) | (KeyCode::Char(' '), _) => {
                     return Ok(Some(SelectVal::Select));
                 }
