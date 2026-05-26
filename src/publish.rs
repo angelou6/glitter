@@ -45,8 +45,8 @@ pub fn draw() -> io::Result<(String, String, bool)> {
     let cwd = cwd.file_name().unwrap().to_string_lossy();
 
     enable_raw_mode()?;
-    let name = input::draw("Name", &cwd)?;
-    let desc = input::draw("Description", "")?;
+    let name = input::draw("Name", &cwd, false)?;
+    let desc = input::draw("Description", "", true)?;
 
     execute!(io::stdout(), Print("Visibility:"), Print("\r\n"))?;
     let is_private = draw_visibility_selection()?;
