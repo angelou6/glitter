@@ -27,14 +27,18 @@ fn git_messages(messages: &[String]) -> Vec<&str> {
     res
 }
 
-pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
-    let status = stage::get_simple_status();
-
+fn smart_stage(status: &stage::Status, all: bool) -> Result<(), String> {
     if status.staged.is_empty() && status.unstaged.is_empty() {
         return Err(String::from("Nothing to commit"));
     } else if status.staged.is_empty() || all {
         run_command(&["git", "add", "."]);
     }
+    Ok(())
+}
+
+pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
+    let status = stage::get_simple_status();
+    smart_stage(&status, all)?;
 
     if message.is_empty() && force {
         let count = status.staged.len();
@@ -55,8 +59,8 @@ pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<()
     Ok(())
 }
 
-pub fn amend_commit(message: Vec<String>) {
-    run_command(&["git", "add", "."]);
+pub fn amend_commit(message: Vec<String>, all: bool) -> Result<(), String> {
+    let _ = smart_stage(&stage::get_simple_status(), all);
 
     if message.len() == 0 {
         run_command(&["git", "commit", "--amend", "--no-edit"]);
@@ -66,6 +70,7 @@ pub fn amend_commit(message: Vec<String>) {
         args.append(&mut messages);
         run_command(&args);
     }
+    Ok(())
 }
 
 pub fn push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
@@ -78,8 +83,8 @@ pub fn push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> 
     Ok(())
 }
 
-pub fn amend_push(message: Vec<String>, force: bool) {
-    amend_commit(message);
+pub fn amend_push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
+    amend_commit(message, all)?;
     run_command(&[
         "git",
         "push",
@@ -89,6 +94,7 @@ pub fn amend_push(message: Vec<String>, force: bool) {
             "--force-with-lease"
         },
     ]);
+    Ok(())
 }
 
 pub fn pull() {

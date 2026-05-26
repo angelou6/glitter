@@ -42,14 +42,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         Commands::Push(args) => {
             if args.amend {
-                git::amend_push(args.message, args.force);
+                git::amend_push(args.message, args.force, args.all)?;
             } else {
                 git::push(args.message, args.force, args.all)?;
             }
         }
         Commands::Commit(args) => {
             if args.amend {
-                git::amend_commit(args.message);
+                git::amend_commit(args.message, args.all)?;
             } else {
                 git::add_and_commit(args.message, args.force, args.all)?;
             }
