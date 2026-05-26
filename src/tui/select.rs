@@ -109,7 +109,7 @@ impl<T: DrawOption> Selector<T> {
                 }
                 (KeyCode::Down, _) => self.pointer = (self.pointer + 1) % self.options.len(),
                 (KeyCode::Up, _) => self.pointer = (self.pointer - 1) % self.options.len(),
-                (KeyCode::Enter, _) => {
+                (KeyCode::Enter, _) | (KeyCode::Char(' '), _) => {
                     return Ok(Some(SelectVal::Select));
                 }
                 _ => {}
