@@ -78,6 +78,7 @@ fn draw_stage_selection() -> io::Result<()> {
             Some(select::SelectVal::Select) => {
                 if let Some(file) = selector.options.get_mut(selector.pointer) {
                     file.toggle();
+                    selector.move_down();
                 }
             }
             _ => {}
