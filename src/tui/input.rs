@@ -31,7 +31,7 @@ fn print_user_input(stdout: &mut io::Stdout, input: &str, offset: u16) -> io::Re
     Ok(())
 }
 
-pub fn draw(label: &str, default: &str) -> io::Result<String> {
+pub fn draw(label: &str, default: &str, allow_spaces: bool) -> io::Result<String> {
     let mut stdout = io::stdout();
     let mut input = String::new();
     let mut pointer: usize = 0;
@@ -107,7 +107,14 @@ pub fn draw(label: &str, default: &str) -> io::Result<String> {
                 }
                 other => {
                     if let Some(c) = other.0.as_char() {
-                        input.insert(pointer, c);
+                        input.insert(
+                            pointer,
+                            if !allow_spaces && c.is_whitespace() {
+                                '-'
+                            } else {
+                                c
+                            },
+                        );
                         pointer += 1;
                         print_user_input(&mut stdout, &input, offset)?;
                     }
