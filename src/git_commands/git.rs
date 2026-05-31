@@ -4,24 +4,28 @@ use std::{
 };
 
 use crate::{
-    commands::{run_command, run_command_output},
-    git_commands::helper::{git_messages, smart_stage},
+    commands::{command, command_output, command_silent},
+    git_commands::helper::{git_messages, repo_has_commits, smart_stage},
     stage,
 };
 
 pub fn stage(files: Vec<String>) {
     let mut args: Vec<&str> = vec!["git", "add"];
     args.extend(files.iter().map(String::as_str));
-    run_command(&args);
+    command(&args);
 }
 
 pub fn unstage(location: &str) {
-    run_command(&["git", "restore", "--staged", location]);
+    if repo_has_commits() {
+        command(&["git", "restore", "--staged", location]);
+    } else {
+        command_silent(&["git", "rm", "-r", "--cached", location]);
+    }
 }
 
 pub fn pull(force: bool, skip: bool) {
     if !force {
-        run_command(&["git", "pull"]);
+        command(&["git", "pull"]);
     } else {
         if !skip {
             let mut input = String::new();
@@ -47,8 +51,8 @@ pub fn pull(force: bool, skip: bool) {
             }
         }
 
-        run_command(&["git", "fetch", "origin"]);
-        run_command(&["git", "reset", "--hard", "@{u}"]);
+        command(&["git", "fetch", "origin"]);
+        command(&["git", "reset", "--hard", "@{u}"]);
     }
 }
 
@@ -64,12 +68,12 @@ pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<()
             if count == 1 { "" } else { "s" }
         );
         let list_str = format!("Files changed: {}", status.staged.join(", "));
-        run_command(&["git", "commit", "-m", &msg, "-m", &list_str]);
+        command(&["git", "commit", "-m", &msg, "-m", &list_str]);
     } else {
         let mut args = vec!["git", "commit"];
         let mut messages = git_messages(&message);
         args.append(&mut messages);
-        run_command(&args);
+        command(&args);
     }
 
     Ok(())
@@ -77,7 +81,7 @@ pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<()
 
 pub fn push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
     add_and_commit(message, force, all).unwrap_or_else(|e| eprintln!("{e}"));
-    run_command(if force {
+    command(if force {
         &["git", "push", "--force"]
     } else {
         &["git", "push"]
@@ -89,19 +93,19 @@ pub fn amend_commit(message: Vec<String>, all: bool) -> Result<(), String> {
     let _ = smart_stage(&stage::get_simple_status(), all);
 
     if message.len() == 0 {
-        run_command(&["git", "commit", "--amend", "--no-edit"]);
+        command(&["git", "commit", "--amend", "--no-edit"]);
     } else {
         let mut args = vec!["git", "commit", "--amend"];
         let mut messages = git_messages(&message);
         args.append(&mut messages);
-        run_command(&args);
+        command(&args);
     }
     Ok(())
 }
 
 pub fn amend_push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
     amend_commit(message, all)?;
-    run_command(&[
+    command(&[
         "git",
         "push",
         if force {
@@ -113,17 +117,23 @@ pub fn amend_push(message: Vec<String>, force: bool, all: bool) -> Result<(), St
     Ok(())
 }
 
-pub fn undo_commit(hard: bool, commit: String) {
-    if hard {
-        run_command(&["git", "reset", "--hard", &commit]);
+pub fn undo_commit(hard: bool, commit: String) -> Result<(), String> {
+    if repo_has_commits() {
+        if hard {
+            command(&["git", "reset", "--hard", &commit]);
+        } else {
+            command(&["git", "reset", &commit]);
+        }
+        Ok(())
     } else {
-        run_command(&["git", "reset", &commit]);
+        Err(String::from("This repo has no commits."))
     }
 }
 
-pub fn undo_push(hard: bool, commit: String) {
-    undo_commit(hard, commit);
-    run_command(&["git", "push", "--force-with-lease"]);
+pub fn undo_push(hard: bool, commit: String) -> Result<(), String> {
+    undo_commit(hard, commit)?;
+    command(&["git", "push", "--force-with-lease"]);
+    Ok(())
 }
 
 pub fn revert_stage(files: Vec<String>) {
@@ -133,15 +143,15 @@ pub fn revert_stage(files: Vec<String>) {
     } else {
         args.push(".");
     }
-    run_command(&args);
+    command(&args);
 }
 
 pub fn init(messages: Vec<String>, branch: String) -> Result<(), String> {
     if Path::new(".git").is_dir() {
         Err(String::from("This directory has already been initialized"))
     } else {
-        run_command(&["git", "init"]);
-        run_command(&["git", "branch", "-M", &branch]);
+        command(&["git", "init"]);
+        command(&["git", "branch", "-M", &branch]);
         add_and_commit(
             if messages.is_empty() {
                 vec!["initial commit".into()]
@@ -156,10 +166,10 @@ pub fn init(messages: Vec<String>, branch: String) -> Result<(), String> {
 }
 
 pub fn setup_origin(remote: &str) {
-    run_command(&["git", "remote", "add", "origin", remote]);
+    command(&["git", "remote", "add", "origin", remote]);
 }
 
 pub fn push_to_origin() {
-    let branch = run_command_output(&["git", "branch", "--show-current"]);
-    run_command(&["git", "push", "-u", "origin", &branch.trim()]);
+    let branch = command_output(&["git", "branch", "--show-current"]);
+    command(&["git", "push", "-u", "origin", &branch.trim()]);
 }

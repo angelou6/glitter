@@ -57,8 +57,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Undo(args) => match args.action {
-            undo::UndoTarget::Commit => git::undo_commit(args.hard, args.commit),
-            undo::UndoTarget::Push => git::undo_push(args.hard, args.commit),
+            undo::UndoTarget::Commit => git::undo_commit(args.hard, args.commit)?,
+            undo::UndoTarget::Push => git::undo_push(args.hard, args.commit)?,
         },
         Commands::Add(args) => {
             if args.files.is_empty() && args.revert {
