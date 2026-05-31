@@ -52,6 +52,7 @@ pub struct Selector<T: DrawOption> {
     pub options: Vec<T>,
     pub pointer: usize,
     stdout: io::Stdout,
+    position_saved: bool,
 }
 
 pub fn new<T: DrawOption>(options: Vec<T>) -> Selector<T> {
@@ -59,12 +60,15 @@ pub fn new<T: DrawOption>(options: Vec<T>) -> Selector<T> {
         options,
         pointer: 0,
         stdout: io::stdout(),
+        position_saved: false,
     }
 }
 
 impl<T: DrawOption> Drop for Selector<T> {
     fn drop(&mut self) {
-        let _ = execute!(self.stdout, cursor::RestorePosition, cursor::Show);
+        if self.position_saved {
+            let _ = execute!(self.stdout, cursor::RestorePosition, cursor::Show);
+        }
     }
 }
 
@@ -86,7 +90,7 @@ impl<T: DrawOption> Selector<T> {
             cursor::SavePosition,
             cursor::MoveToPreviousLine(self.options.len() as u16)
         )?;
-
+        self.position_saved = true;
         self.stdout.flush()?;
         Ok(())
     }
