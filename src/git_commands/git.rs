@@ -5,35 +5,51 @@ use std::{
 
 use crate::{
     commands::{run_command, run_command_output},
+    git_commands::helper::{git_messages, smart_stage},
     stage,
 };
 
-pub fn stage(location: &str) {
-    run_command(&["git", "add", location]);
+pub fn stage(files: Vec<String>) {
+    let mut args: Vec<&str> = vec!["git", "add"];
+    args.extend(files.iter().map(String::as_str));
+    run_command(&args);
 }
 
 pub fn unstage(location: &str) {
     run_command(&["git", "restore", "--staged", location]);
 }
 
-fn git_messages(messages: &[String]) -> Vec<&str> {
-    let mut res: Vec<&str> = Vec::new();
+pub fn pull(force: bool, skip: bool) {
+    if !force {
+        run_command(&["git", "pull"]);
+    } else {
+        if !skip {
+            let mut input = String::new();
+            print!("This will wipe uncommited changes. Are you sure? [y/N] ");
+            io::stdout().flush().expect("Could not print");
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Error reading message");
 
-    for message in messages {
-        res.push("-m");
-        res.push(message);
+            let response = input.trim().to_lowercase();
+            let response = if response.is_empty() {
+                String::from("n")
+            } else {
+                response
+            };
+            match response.as_str() {
+                "n" => std::process::exit(0),
+                "y" => (),
+                _ => {
+                    println!("That is not a command");
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        run_command(&["git", "fetch", "origin"]);
+        run_command(&["git", "reset", "--hard", "@{u}"]);
     }
-
-    res
-}
-
-fn smart_stage(status: &stage::Status, all: bool) -> Result<(), String> {
-    if status.staged.is_empty() && status.unstaged.is_empty() {
-        return Err(String::from("Nothing to commit"));
-    } else if status.staged.is_empty() || all {
-        run_command(&["git", "add", "."]);
-    }
-    Ok(())
 }
 
 pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
@@ -59,6 +75,16 @@ pub fn add_and_commit(message: Vec<String>, force: bool, all: bool) -> Result<()
     Ok(())
 }
 
+pub fn push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
+    add_and_commit(message, force, all).unwrap_or_else(|e| eprintln!("{e}"));
+    run_command(if force {
+        &["git", "push", "--force"]
+    } else {
+        &["git", "push"]
+    });
+    Ok(())
+}
+
 pub fn amend_commit(message: Vec<String>, all: bool) -> Result<(), String> {
     let _ = smart_stage(&stage::get_simple_status(), all);
 
@@ -70,16 +96,6 @@ pub fn amend_commit(message: Vec<String>, all: bool) -> Result<(), String> {
         args.append(&mut messages);
         run_command(&args);
     }
-    Ok(())
-}
-
-pub fn push(message: Vec<String>, force: bool, all: bool) -> Result<(), String> {
-    add_and_commit(message, force, all).unwrap_or_else(|e| eprintln!("{e}"));
-    run_command(if force {
-        &["git", "push", "--force"]
-    } else {
-        &["git", "push"]
-    });
     Ok(())
 }
 
@@ -95,39 +111,6 @@ pub fn amend_push(message: Vec<String>, force: bool, all: bool) -> Result<(), St
         },
     ]);
     Ok(())
-}
-
-pub fn pull() {
-    run_command(&["git", "pull"]);
-}
-
-pub fn force_pull(skip: bool) {
-    if !skip {
-        let mut input = String::new();
-        print!("This will wipe uncommited changes. Are you sure? [y/N] ");
-        io::stdout().flush().expect("Could not print");
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Error reading message");
-
-        let response = input.trim().to_lowercase();
-        let response = if response.is_empty() {
-            String::from("n")
-        } else {
-            response
-        };
-        match response.as_str() {
-            "n" => std::process::exit(0),
-            "y" => (),
-            _ => {
-                println!("That is not a command");
-                std::process::exit(1);
-            }
-        }
-    }
-
-    run_command(&["git", "fetch", "origin"]);
-    run_command(&["git", "reset", "--hard", "@{u}"]);
 }
 
 pub fn undo_commit(hard: bool, commit: String) {
@@ -150,12 +133,6 @@ pub fn revert_stage(files: Vec<String>) {
     } else {
         args.push(".");
     }
-    run_command(&args);
-}
-
-pub fn stage_files(files: Vec<String>) {
-    let mut args: Vec<&str> = vec!["git", "add"];
-    args.extend(files.iter().map(String::as_str));
     run_command(&args);
 }
 

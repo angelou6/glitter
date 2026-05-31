@@ -1,7 +1,7 @@
 use ::std::process::Command;
 use std::io::ErrorKind;
 
-/// Run a command output to stdout
+/// Run command and output to stdout
 pub fn run_command(args: &[&str]) {
     Command::new(args[0])
         .args(&args[1..])
@@ -12,7 +12,7 @@ pub fn run_command(args: &[&str]) {
         });
 }
 
-/// Run a command and get its output
+/// Run command return its output
 pub fn run_command_output(args: &[&str]) -> String {
     let out = Command::new(args[0])
         .args(&args[1..])

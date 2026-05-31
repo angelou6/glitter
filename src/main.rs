@@ -1,13 +1,15 @@
 mod cli;
 mod commands;
-mod git;
-mod publish;
-mod stage;
+mod git_commands;
 mod subcommands;
 mod tui;
-mod url;
 
-use crate::{cli::Commands, subcommands::undo};
+use crate::{
+    cli::Commands,
+    git_commands::{git, url},
+    subcommands::undo,
+    tui::{publish, stage},
+};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = cli::parse();
@@ -17,7 +19,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Publish(args) => match args.origin {
             Some(origin) => {
-                eprintln!("Arguments for publish ignored");
+                eprintln!("Arguments for publish beign ignored");
                 git::setup_origin(&origin);
                 git::push_to_origin();
             }
@@ -70,15 +72,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             } else if args.revert {
                 git::revert_stage(args.files);
             } else {
-                git::stage_files(args.files);
+                git::stage(args.files);
             }
         }
         Commands::Pull(args) => {
-            if args.force {
-                git::force_pull(args.yes)
-            } else {
-                git::pull();
-            }
+            git::pull(args.force, args.yes);
         }
         Commands::Open(args) => {
             let remote = url::get_project_url();

@@ -1,4 +1,4 @@
-use crate::{commands, git, tui::select};
+use crate::{commands, git_commands::git, tui::select};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use std::io;
 use std::vec;
@@ -19,7 +19,7 @@ impl File {
         if self.is_tracked {
             git::unstage(&self.path);
         } else {
-            git::stage(&self.path);
+            git::stage(vec![self.path.to_string()]);
         }
         self.is_tracked = !self.is_tracked;
     }

@@ -1,0 +1,21 @@
+use crate::{commands::run_command, tui::stage};
+
+pub fn git_messages(messages: &[String]) -> Vec<&str> {
+    let mut res: Vec<&str> = Vec::new();
+
+    for message in messages {
+        res.push("-m");
+        res.push(message);
+    }
+
+    res
+}
+
+pub fn smart_stage(status: &stage::Status, all: bool) -> Result<(), String> {
+    if status.staged.is_empty() && status.unstaged.is_empty() {
+        return Err(String::from("Nothing to commit"));
+    } else if status.staged.is_empty() || all {
+        run_command(&["git", "add", "."]);
+    }
+    Ok(())
+}
