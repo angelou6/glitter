@@ -26,7 +26,7 @@ impl File {
 }
 
 fn parse_status() -> Vec<File> {
-    let status = commands::run_command_output(&["git", "status", "--porcelain", "-uall"]);
+    let status = commands::command_output(&["git", "status", "--porcelain", "-uall"]);
     let status: Vec<&str> = status.trim_end().split('\n').collect();
 
     let mut files: Vec<File> = vec![];

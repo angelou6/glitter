@@ -1,4 +1,4 @@
-use crate::commands::run_command;
+use crate::commands::command;
 use crate::tui::select::Selector;
 use crate::tui::{input, select};
 use crossterm::execute;
@@ -9,7 +9,7 @@ use std::io;
 
 // Maybe at some point add forgejo/codeberg support if I ever move there
 pub fn github(name: String, description: String, private: bool) {
-    run_command(&[
+    command(&[
         "gh",
         "repo",
         "create",
