@@ -42,7 +42,7 @@ pub fn draw(label: &str, default: &str, allow_spaces: bool) -> io::Result<String
         Print(label),
         SetForegroundColor(Color::Grey),
         Print(if default.is_empty() {
-            String::from(" (optional)")
+            " (optional)".into()
         } else {
             format!(" (default: {default})")
         }),

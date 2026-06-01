@@ -1,11 +1,8 @@
-use std::{
-    io::{self, Write},
-    path::Path,
-};
+use std::io::{self, Write};
 
 use crate::{
     commands::{command, command_output, command_silent},
-    git_commands::helper::{git_messages, repo_has_commits, smart_stage},
+    helper::{git_messages, is_repo, repo_has_commits, smart_stage},
     stage,
 };
 
@@ -37,7 +34,7 @@ pub fn pull(force: bool, skip: bool) {
 
             let response = input.trim().to_lowercase();
             let response = if response.is_empty() {
-                String::from("n")
+                "n".into()
             } else {
                 response
             };
@@ -126,7 +123,7 @@ pub fn undo_commit(hard: bool, commit: String) -> Result<(), String> {
         }
         Ok(())
     } else {
-        Err(String::from("This repo has no commits."))
+        Err("This repo has no commits.".into())
     }
 }
 
@@ -147,8 +144,8 @@ pub fn revert_stage(files: Vec<String>) {
 }
 
 pub fn init(messages: Vec<String>, branch: String) -> Result<(), String> {
-    if Path::new(".git").is_dir() {
-        Err(String::from("This directory has already been initialized"))
+    if is_repo() {
+        Err("This directory has already been initialized".into())
     } else {
         command(&["git", "init"]);
         command(&["git", "branch", "-M", &branch]);
