@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::{
     commands::{command, command_silent},
     tui::stage,
@@ -16,7 +18,7 @@ pub fn git_messages(messages: &[String]) -> Vec<&str> {
 
 pub fn smart_stage(status: &stage::Status, all: bool) -> Result<(), String> {
     if status.staged.is_empty() && status.unstaged.is_empty() {
-        return Err(String::from("Nothing to commit"));
+        return Err("Nothing to commit".into());
     } else if status.staged.is_empty() || all {
         command(&["git", "add", "."]);
     }
@@ -25,4 +27,8 @@ pub fn smart_stage(status: &stage::Status, all: bool) -> Result<(), String> {
 
 pub fn repo_has_commits() -> bool {
     command_silent(&["git", "rev-parse", "--verify", "HEAD"]).success()
+}
+
+pub fn is_repo() -> bool {
+    Path::new(".git").is_dir()
 }

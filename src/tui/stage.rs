@@ -34,8 +34,8 @@ fn parse_status() -> Vec<File> {
     for file in status {
         if let Some(path) = file.split_whitespace().last() {
             files.push(File {
-                path: String::from(path),
-                full_str: String::from(file),
+                path: path.into(),
+                full_str: file.into(),
                 is_tracked: !file.starts_with(' ') && !file.starts_with('?'),
             });
         }

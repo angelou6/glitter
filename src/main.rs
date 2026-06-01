@@ -1,12 +1,14 @@
 mod cli;
 mod commands;
 mod git_commands;
+mod helper;
 mod subcommands;
 mod tui;
 
 use crate::{
     cli::Commands,
     git_commands::{git, url},
+    helper::is_repo,
     subcommands::undo,
     tui::{publish, stage},
 };
@@ -17,31 +19,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Init(args) => {
             git::init(args.message, args.branch)?;
         }
-        Commands::Publish(args) => match args.origin {
-            Some(origin) => {
-                eprintln!("Arguments for publish beign ignored");
-                git::setup_origin(&origin);
-                git::push_to_origin();
+        Commands::Publish(args) => {
+            if !is_repo() {
+                return Err("This is not a repo".into());
             }
-            None => {
-                if !commands::command_exists("gh") {
-                    eprint!("Error: github-cli not found.");
-                    std::process::exit(1);
+            match args.origin {
+                Some(origin) => {
+                    eprintln!("Arguments for publish beign ignored");
+                    git::setup_origin(&origin);
+                    git::push_to_origin();
                 }
-
-                if !args.is_empty() {
-                    let name = args.name.unwrap();
-                    let desc = args.desc.unwrap_or_default();
-                    publish::github(name, desc, args.private)
-                } else {
-                    let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
-                        eprint!("Error: {e}");
+                None => {
+                    if !commands::command_exists("gh") {
+                        eprint!("Error: github-cli not found.");
                         std::process::exit(1);
-                    });
-                    publish::github(name, desc, private);
+                    }
+
+                    if !args.is_empty() {
+                        let name = args.name.unwrap();
+                        let desc = args.desc.unwrap_or_default();
+                        publish::github(name, desc, args.private)
+                    } else {
+                        let (name, desc, private) = publish::draw().unwrap_or_else(|e| {
+                            eprint!("Error: {e}");
+                            std::process::exit(1);
+                        });
+                        publish::github(name, desc, private);
+                    }
                 }
             }
-        },
+        }
         Commands::Push(args) => {
             if args.amend {
                 git::amend_push(args.message, args.force, args.all)?;
