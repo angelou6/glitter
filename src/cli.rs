@@ -22,6 +22,7 @@ pub enum Commands {
     /// Publish to github or origin
     Publish(subcommands::publish::Arguments),
 
+    #[command(arg_required_else_help = true)]
     /// Stage all files and commit
     Commit(subcommands::commit_push::Arguments),
 
