@@ -1,11 +1,11 @@
 # ✨ Glitter
-
+<!--
 <p align="center">
   <img src="https://github.com/angelou6/glitter/blob/main/assets/logo.png?raw=true" alt="glitter logo"/>
 </p>
 
 ---
-
+-->
 `Glitter` is a tool that provides some shorcuts that I found useful for solo projects.
 
 ## Why?
