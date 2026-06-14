@@ -25,7 +25,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             match args.origin {
                 Some(origin) => {
-                    eprintln!("Arguments for publish beign ignored");
+                    if args.private || args.name.is_some() || args.desc.is_some() {
+                        eprintln!("Any other arguments for publish are ignored");
+                    }
                     git::setup_origin(&origin);
                     git::push_to_origin();
                 }
