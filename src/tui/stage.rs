@@ -17,15 +17,15 @@ pub struct Status {
 impl File {
     fn toggle(&mut self) {
         if self.is_tracked {
-            git::unstage(&self.path);
+            git::unstage(vec![self.path.clone()]).unwrap();
         } else {
-            git::stage(vec![self.path.to_string()]);
+            git::stage(vec![self.path.clone()]);
         }
         self.is_tracked = !self.is_tracked;
     }
 }
 
-fn parse_status() -> Vec<File> {
+pub fn parse_status() -> Vec<File> {
     let status = commands::command_output(&["git", "status", "--porcelain", "-uall"]);
     let status: Vec<&str> = status.trim_end().split('\n').collect();
 
@@ -42,16 +42,6 @@ fn parse_status() -> Vec<File> {
     }
 
     files
-}
-
-pub fn get_simple_status() -> Status {
-    let status = parse_status();
-    let (staged, unstaged): (Vec<_>, Vec<_>) = status.iter().partition(|f| f.is_tracked);
-
-    Status {
-        staged: staged.into_iter().map(|f| f.path.clone()).collect(),
-        unstaged: unstaged.into_iter().map(|f| f.path.clone()).collect(),
-    }
 }
 
 fn draw_stage_selection() -> io::Result<()> {

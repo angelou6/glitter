@@ -1,22 +1,33 @@
 mod cli;
 mod commands;
 mod git_commands;
-mod helper;
 mod subcommands;
 mod tui;
+
+use std::path::Path;
 
 use crate::{
     cli::Commands,
     git_commands::{git, url},
-    helper::is_repo,
     subcommands::undo,
     tui::{publish, stage},
 };
+
+fn is_repo() -> bool {
+    Path::new(".git").is_dir()
+}
+
+fn has_changes() -> bool {
+    !commands::command_output(&["git", "diff"]).is_empty()
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = cli::parse();
     match cli.command {
         Commands::Init(args) => {
+            if is_repo() {
+                return Err("This directory has already been initialized".into());
+            }
             git::init(args.message, args.branch)?;
         }
         Commands::Publish(args) => {
@@ -33,8 +44,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 None => {
                     if !commands::command_exists("gh") {
-                        eprint!("Error: github-cli not found.");
-                        std::process::exit(1);
+                        return Err("github-cli not found.".into());
                     }
 
                     if !args.is_empty() {
@@ -52,6 +62,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Push(args) => {
+            if !has_changes() {
+                return Err("There are no chanegs to push".into());
+            }
+
             if args.amend {
                 git::amend_push(args.message, args.force, args.all)?;
             } else {
@@ -59,6 +73,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Commit(args) => {
+            if !has_changes() {
+                return Err("There are no chanegs to commit".into());
+            }
+
             if args.amend {
                 git::amend_commit(args.message, args.all)?;
             } else {
@@ -70,16 +88,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             undo::UndoTarget::Push => git::undo_push(args.hard, args.commit)?,
         },
         Commands::Add(args) => {
-            if args.files.is_empty() && args.revert {
-                eprint!("Error: No files to revert");
-                std::process::exit(1);
-            } else if args.files.is_empty() {
+            if args.files.is_empty() {
                 stage::draw().unwrap_or_else(|e| {
                     eprint!("Error: {e}");
                     std::process::exit(1);
                 });
             } else if args.revert {
-                git::revert_stage(args.files);
+                git::unstage(args.files)?;
             } else {
                 git::stage(args.files);
             }
