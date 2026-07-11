@@ -62,10 +62,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Push(args) => {
-            if !has_changes() {
-                return Err("There are no chanegs to push".into());
-            }
-
             if args.amend {
                 git::amend_push(args.message, args.force, args.all)?;
             } else {
@@ -74,7 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Commit(args) => {
             if !has_changes() {
-                return Err("There are no chanegs to commit".into());
+                return Err("There are no changes to commit".into());
             }
 
             if args.amend {
