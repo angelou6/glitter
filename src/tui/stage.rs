@@ -9,11 +9,6 @@ pub struct File {
     pub is_tracked: bool,
 }
 
-pub struct Status {
-    pub staged: Vec<String>,
-    pub unstaged: Vec<String>,
-}
-
 impl File {
     fn toggle(&mut self) {
         if self.is_tracked {

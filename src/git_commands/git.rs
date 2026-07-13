@@ -106,7 +106,9 @@ pub fn push(messages: Vec<String>, force: bool, all: bool) -> Result<(), String>
 }
 
 pub fn amend_commit(message: Vec<String>, all: bool) -> Result<(), String> {
-    let _ = utils::smart_stage(&utils::get_simple_status(), all);
+    if utils::get_staged().is_empty() || all {
+        stage(vec![".".into()]);
+    }
 
     if message.len() == 0 {
         command(&["git", "commit", "--amend", "--no-edit"]);
