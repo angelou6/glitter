@@ -1,11 +1,11 @@
 .PHONY: build install uninstall
 
-BIN = target/release/glitter
+BIN = glitter
 PREFIX ?= /usr/local
 BINNAME ?= glitter
 
 build:
-	cargo build --release
+    go build -ldflags="-s -w" -trimpath
 
 install: build
 	install -Dm755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
