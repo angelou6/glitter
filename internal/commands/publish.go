@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"charm.land/huh/v2"
+	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v3"
 )
 
@@ -94,39 +94,38 @@ func newPublishCommand() *cli.Command {
 				return github(name, desc, private)
 			}
 
-			var name string
-			var desc string
-			visibility := "private"
-
-			form := huh.NewForm(
-				huh.NewGroup(
-					huh.NewInput().
-						Title("Name").
-						Value(&name).
-						Placeholder(cwd()).
-						Validate(func(s string) error {
-							if strings.ContainsAny(s, " ") {
-								return errors.New("no spaces allowed")
-							}
-							return nil
-						}),
-					huh.NewInput().
-						Title("Description").
-						Value(&desc),
-					huh.NewSelect[string]().
-						Title("Visibility").
-						Options(
-							huh.NewOption("Private", "private"),
-							huh.NewOption("Public", "public"),
-						).
-						Value(&visibility),
-				),
-			)
-
-			err := form.Run()
-			if errors.Is(err, huh.ErrUserAborted) {
+			namePrompt := promptui.Prompt{
+				Label: "Name",
+				Validate: func(s string) error {
+					if strings.ContainsAny(s, " ") {
+						return errors.New("Name cannot contain spaces")
+					}
+					return nil
+				},
+				Default: cwd(),
+			}
+			name, err := namePrompt.Run()
+			if err != nil {
 				return err
 			}
+
+			descPrompt := promptui.Prompt{
+				Label: "Description",
+			}
+			desc, err := descPrompt.Run()
+			if err != nil {
+				return err
+			}
+
+			selectPrompt := promptui.Select{
+				Label: "Visibility",
+				Items: []string{"private", "public"},
+			}
+			_, visibility, err := selectPrompt.Run()
+			if err != nil {
+				return err
+			}
+
 			return github(name, desc, visibility == "private")
 		},
 	}

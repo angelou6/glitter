@@ -3,9 +3,8 @@ package commands
 import (
 	"context"
 	"glitter/internal/git"
-	"os"
 
-	"charm.land/huh/v2"
+	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v3"
 )
 
@@ -34,16 +33,15 @@ func newPullCommand() *cli.Command {
 			}
 
 			if !skip {
-				var confirm bool
-				huh.NewConfirm().
-					Title("This will wipe uncommited changes. Are you sure?").
-					Affirmative("Yes").
-					Negative("No").
-					Value(&confirm).
-					Run()
+				prompt := promptui.Prompt{
+					Label:     "This will wipe uncommited changes. Are you sure",
+					IsConfirm: true,
+				}
 
-				if !confirm {
-					os.Exit(0)
+				_, err := prompt.Run()
+				// selecting No is for some reason an error
+				if err != nil {
+					return err
 				}
 			}
 			return git.ForcePull()
