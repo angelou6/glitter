@@ -103,7 +103,7 @@ I don't use either of them, but I assume this will work.
 If there are any errors, PRs are welcome.
 
 ```
-cargo install --path .
+go install .
 ```
 
 ## Dependencies
