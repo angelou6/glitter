@@ -2,20 +2,58 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"glitter/internal/git"
 
-	"charm.land/huh/v2"
+	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v3"
 )
 
-func fileOptions() []huh.Option[git.File] {
-	var options []huh.Option[git.File]
-	files := git.ParseStatus()
+func selectFilesToToggle(files []git.File) []git.File {
+	const doneLabel = "done"
 
-	for _, f := range files {
-		options = append(options, huh.NewOption(f.Path, f).Selected(f.IsTracked))
+	marked := make(map[int]bool, len(files))
+	for i, f := range files {
+		marked[i] = f.IsTracked
 	}
-	return options
+	cursor := 0
+
+	for {
+		items := make([]string, 0, len(files)+1)
+		for i, f := range files {
+			checkbox := "[ ]"
+			if marked[i] {
+				checkbox = "[x]"
+			}
+			items = append(items, fmt.Sprintf("%s %s", checkbox, f.Path))
+		}
+		items = append(items, doneLabel)
+
+		prompt := promptui.Select{
+			Label:        "Toggle tracked state (enter to toggle, select done to confirm)",
+			Items:        items,
+			Size:         len(items),
+			HideSelected: true,
+			CursorPos:    cursor,
+		}
+
+		idx, result, err := prompt.Run()
+		if err != nil || result == doneLabel {
+			break
+		}
+
+		cursor = idx
+		marked[idx] = !marked[idx]
+	}
+
+	var toggled []git.File
+	for i, f := range files {
+		if marked[i] != f.IsTracked {
+			toggled = append(toggled, f)
+		}
+	}
+
+	return toggled
 }
 
 func newAddCommand() *cli.Command {
@@ -40,20 +78,11 @@ func newAddCommand() *cli.Command {
 		Action: func(ctx context.Context, c *cli.Command) error {
 			files := c.StringArgs("files")
 			revert := c.Bool("revert")
-			var selected []git.File
 
 			if len(files) == 0 {
-				f := fileOptions()
-
-				huh.NewMultiSelect[git.File]().
-					Title("Files").
-					Options(f...).
-					Value(&selected).
-					Height(len(f) + 1).
-					Run()
-
-				for _, s := range selected {
-					s.Toggle()
+				toggled := selectFilesToToggle(git.ParseStatus())
+				for i := range toggled {
+					toggled[i].Toggle()
 				}
 
 				return nil
