@@ -52,7 +52,7 @@ glitter publish -o https://github.com/angelou6/glitter.git
 
 | Stage                           | Publish                           |
 | ------------------------------- | --------------------------------- |
-| ![stage tui](/assets/stage.png) | ![stage tui](/assets/publish.png) |
+| ![stage tui](/assets/stage.png) | ![publish tui](/assets/publish.png) |
 
 ## Example usage
 
