@@ -30,7 +30,7 @@ func newPushCommand() *cli.Command {
 				Aliases: []string{"m"},
 			},
 			&cli.BoolFlag{
-				Name:  "ammend",
+				Name:  "amend",
 				Usage: "Amend all new modifications to latest",
 			},
 			&cli.BoolFlag{
