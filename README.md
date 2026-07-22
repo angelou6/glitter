@@ -1,4 +1,5 @@
 # ✨ Glitter
+
 <!--
 <p align="center">
   <img src="https://github.com/angelou6/glitter/blob/main/assets/logo.png?raw=true" alt="glitter logo"/>
@@ -6,6 +7,7 @@
 
 ---
 -->
+
 `Glitter` is a tool that provides some shorcuts that I found useful for solo projects.
 
 ## Why?
@@ -50,8 +52,8 @@ glitter publish -o https://github.com/angelou6/glitter.git
 
 `Glitter` also has some small TUIs to help with publishing and staging:
 
-| Stage                           | Publish                           |
-| ------------------------------- | --------------------------------- |
+| Stage                           | Publish                             |
+| ------------------------------- | ----------------------------------- |
 | ![stage tui](/assets/stage.png) | ![publish tui](/assets/publish.png) |
 
 ## Example usage
@@ -98,13 +100,7 @@ sudo make install BINNAME=glt
 
 ### Windows / Mac
 
-I don't use either of them, but I assume this will work.
-
-If there are any errors, PRs are welcome.
-
-```
-go install .
-```
+Run `go install` or `go build` and place the binary wherever you want.
 
 ## Dependencies
 
