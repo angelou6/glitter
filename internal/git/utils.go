@@ -18,7 +18,7 @@ func IsRepo() bool {
 }
 
 func HasChanges() bool {
-	out, _ := shell.Command("git", "diff").Output()
+	out, _ := shell.Command("git", "status", "--porcelain").Output()
 	return len(out) > 0
 }
 
