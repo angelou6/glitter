@@ -11,4 +11,4 @@ install: build
 	install -Dm755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
+	rm -f $(shell which $(BINNAME))
