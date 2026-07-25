@@ -1,10 +1,12 @@
 package commands
 
 import (
+	"bufio"
 	"context"
 	"glitter/internal/git"
+	"os"
+	"unicode"
 
-	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v3"
 )
 
@@ -28,23 +30,19 @@ func newPullCommand() *cli.Command {
 			skip := c.Bool("yes")
 			force := c.Bool("force")
 
-			if !force {
-				return git.Pull()
-			}
-
-			if !skip {
-				prompt := promptui.Prompt{
-					Label:     "This will wipe uncommited changes. Are you sure",
-					IsConfirm: true,
+			if force {
+				if !skip {
+					reader := bufio.NewReader(os.Stdin)
+					char, _, _ := reader.ReadRune()
+					if unicode.ToLower(char) == 'n' {
+						return nil
+					}
 				}
 
-				_, err := prompt.Run()
-				// selecting No is for some reason an error
-				if err != nil {
-					return err
-				}
+				return git.ForcePull()
 			}
-			return git.ForcePull()
+
+			return git.Pull()
 		},
 	}
 }

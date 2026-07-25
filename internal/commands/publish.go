@@ -3,13 +3,14 @@ package commands
 import (
 	"context"
 	"errors"
+	"glitter/internal/bubbles/input"
+	"glitter/internal/bubbles/options"
 	"glitter/internal/git"
 	"glitter/internal/shell"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v3"
 )
 
@@ -94,34 +95,24 @@ func newPublishCommand() *cli.Command {
 				return github(name, desc, private)
 			}
 
-			namePrompt := promptui.Prompt{
-				Label: "Name",
-				Validate: func(s string) error {
-					if strings.ContainsAny(s, " ") {
-						return errors.New("Name cannot contain spaces")
+			name, err := input.New("Name", cwd(),
+				func(s string) error {
+					if strings.Contains(s, " ") {
+						return errors.New("Cannot contain spaces")
 					}
 					return nil
 				},
-				Default: cwd(),
-			}
-			name, err := namePrompt.Run()
+			).Run()
 			if err != nil {
 				return err
 			}
 
-			descPrompt := promptui.Prompt{
-				Label: "Description",
-			}
-			desc, err := descPrompt.Run()
+			desc, err := input.New("Description", "", func(s string) error { return nil }).Run()
 			if err != nil {
 				return err
 			}
 
-			selectPrompt := promptui.Select{
-				Label: "Visibility",
-				Items: []string{"private", "public"},
-			}
-			_, visibility, err := selectPrompt.Run()
+			visibility, err := options.New("Project visibility", []string{"private", "public"}).Run()
 			if err != nil {
 				return err
 			}
