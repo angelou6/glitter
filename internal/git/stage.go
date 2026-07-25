@@ -5,20 +5,6 @@ import (
 	"strings"
 )
 
-type File struct {
-	Path, FullStr string
-	IsTracked     bool
-}
-
-func (f *File) Toggle() {
-	if f.IsTracked {
-		Unstage(f.Path)
-	} else {
-		Stage(f.Path)
-	}
-	f.IsTracked = !f.IsTracked
-}
-
 func ParseStatus() []File {
 	status, _ := shell.Command("git", "status", "--porcelain", "-uall").Output()
 	statusFiles := strings.Split(strings.TrimRight(status, "\n"), "\n")
