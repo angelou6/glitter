@@ -1,14 +1,23 @@
 package commands
 
 import (
-	"bufio"
 	"context"
+	"glitter/internal/bubbles/confirm"
 	"glitter/internal/git"
-	"os"
-	"unicode"
+	"glitter/internal/shell"
 
 	"github.com/urfave/cli/v3"
 )
+
+func ForcePull() error {
+	if err := shell.Command("git", "fetch", "origin").Run(); err != nil {
+		return err
+	}
+	if err := shell.Command("git", "reset", "--hard", "@{u}").Run(); err != nil {
+		return err
+	}
+	return shell.Command("git", "clean", "-fd").Run()
+}
 
 func newPullCommand() *cli.Command {
 	return &cli.Command{
@@ -32,14 +41,13 @@ func newPullCommand() *cli.Command {
 
 			if force {
 				if !skip {
-					reader := bufio.NewReader(os.Stdin)
-					char, _, _ := reader.ReadRune()
-					if unicode.ToLower(char) == 'n' {
+					res, _ := confirm.Run("This action will wipe all local changes, are you sure?")
+					if !res {
 						return nil
 					}
 				}
 
-				return git.ForcePull()
+				return ForcePull()
 			}
 
 			return git.Pull()
