@@ -33,13 +33,12 @@ func newCommitCommand() *cli.Command {
 				Aliases: []string{"m"},
 			},
 			&cli.BoolFlag{
-				Name:  "amend",
-				Usage: "Amend all new modifications to latest",
+				Name:  "automessage",
+				Usage: "Auto generates a commit message",
 			},
 			&cli.BoolFlag{
-				Name:    "force",
-				Usage:   "Force command to execute",
-				Aliases: []string{"f"},
+				Name:  "amend",
+				Usage: "Amend all new modifications to latest",
 			},
 			&cli.BoolFlag{
 				Name:    "all",
@@ -59,8 +58,7 @@ func newCommitCommand() *cli.Command {
 				return amendCommit(messages, all)
 			}
 
-			force := c.Bool("force")
-			return git.StageAndCommit(messages, force, all)
+			return git.StageAndCommit(messages, all)
 		},
 	}
 }
