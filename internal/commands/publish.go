@@ -3,6 +3,8 @@ package commands
 import (
 	"context"
 	"errors"
+	"fmt"
+	"glitter/internal/bubbles/confirm"
 	"glitter/internal/bubbles/input"
 	"glitter/internal/bubbles/options"
 	"glitter/internal/git"
@@ -14,13 +16,9 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func setupOrigin(remote string) {
-	shell.Command("git", "remote", "add", "origin", remote)
-}
-
-func pushToOrigin() {
+func pushToOrigin() error {
 	branch, _ := shell.Command("git", "branch", "--show-current").Output()
-	shell.Command("git", "push", "-u", "origin", strings.TrimSpace(branch)).Run()
+	return shell.Command("git", "push", "-u", "origin", strings.TrimSpace(branch)).Run()
 }
 
 func github(name, desc string, private bool) error {
@@ -69,11 +67,20 @@ func newPublishCommand() *cli.Command {
 			if !git.IsRepo() {
 				return errors.New("This is not a repo")
 			}
-			origin := c.String("origin")
 
+			origin := c.String("origin")
 			// TODO: Error handling here
 			if origin != "" {
-				setupOrigin(origin)
+				originalOrigin, _ := shell.Command("git", "config", "--get", "remote.origin.url").Output()
+				if originalOrigin != "" {
+					fmt.Printf("An origin already exists (%s)\n", originalOrigin)
+					res, _ := confirm.Run(fmt.Sprintf("Do you want to replace it with %s?", origin))
+					if !res {
+						return nil
+					}
+					shell.Command("git", "remote", "remove", "origin").Run()
+				}
+				shell.Command("git", "remote", "add", "origin", origin).Run()
 				pushToOrigin()
 
 				return nil
