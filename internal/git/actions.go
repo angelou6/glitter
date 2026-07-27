@@ -10,7 +10,7 @@ func Pull() error {
 	return shell.Command("git", "pull").Run()
 }
 
-func StageAndCommit(messages []string, force, all bool) error {
+func StageAndCommit(messages []string, all bool) error {
 	if len(StagedFiles()) == 0 || all {
 		Stage(".")
 	}
@@ -18,10 +18,10 @@ func StageAndCommit(messages []string, force, all bool) error {
 	args := []string{"git", "commit"}
 	staged := StagedFiles()
 
-	if len(messages) == 0 && force {
+	if len(messages) == 0 {
 		stagedFiles := len(staged)
 		plural := ""
-		if stagedFiles > 0 {
+		if stagedFiles != 1 {
 			plural = "s"
 		}
 
@@ -37,7 +37,7 @@ func StageAndCommit(messages []string, force, all bool) error {
 }
 
 func Push(messages []string, force, all bool) error {
-	if err := StageAndCommit(messages, force, all); err != nil {
+	if err := StageAndCommit(messages, all); err != nil {
 		return err
 	}
 

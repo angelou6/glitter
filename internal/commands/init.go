@@ -15,7 +15,7 @@ func initCommand(messages []string, branch string) {
 	if len(messages) == 0 {
 		messages = []string{"Initial commit"}
 	}
-	git.StageAndCommit(messages, false, true)
+	git.StageAndCommit(messages, true)
 }
 
 func newInitCommand() *cli.Command {
