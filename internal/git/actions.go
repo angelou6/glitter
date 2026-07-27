@@ -6,13 +6,6 @@ import (
 	"strings"
 )
 
-func ForcePull() error {
-	if err := shell.Command("git", "fetch", "origin").Run(); err != nil {
-		return err
-	}
-	return shell.Command("git", "reset", "--hard", "@{u}").Run()
-}
-
 func Pull() error {
 	return shell.Command("git", "pull").Run()
 }
