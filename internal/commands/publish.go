@@ -22,14 +22,14 @@ func pushToOrigin() error {
 }
 
 func github(name, desc string, private bool) error {
-	args := []string{"gh", "repo", "create", name, "--description", desc, "--source", ".", "--remote=origin", "--push"}
+	args := []string{"repo", "create", name, "--description", desc, "--source", ".", "--remote=origin", "--push"}
 	if private {
 		args = append(args, "--private")
 	} else {
 		args = append(args, "--public")
 	}
 
-	return shell.Command(args...).Run()
+	return shell.Command("gh", args...).Run()
 }
 
 func cwd() string {

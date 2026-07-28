@@ -9,8 +9,8 @@ type shellCommand struct {
 	cmd *exec.Cmd
 }
 
-func Command(args ...string) shellCommand {
-	cmd := exec.Command(args[0], args[1:]...)
+func Command(command string, args ...string) shellCommand {
+	cmd := exec.Command(command, args...)
 	cmd.Stderr = os.Stderr
 
 	return shellCommand{cmd}

@@ -2,7 +2,6 @@ package git
 
 import (
 	"glitter/internal/shell"
-	"os"
 )
 
 func RepoHasCommits() bool {
@@ -13,8 +12,7 @@ func RepoHasCommits() bool {
 }
 
 func IsRepo() bool {
-	_, err := os.Stat(".git")
-	return !os.IsNotExist(err)
+	return shell.DirExists(".git")
 }
 
 func HasChanges() bool {

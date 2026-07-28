@@ -36,15 +36,15 @@ func StagedFiles() []string {
 }
 
 func Stage(files ...string) {
-	args := []string{"git", "add"}
+	args := []string{"add"}
 	args = append(args, files...)
-	shell.Command(args...).Run()
+	shell.Command("git", args...).Run()
 }
 
 func Unstage(files ...string) error {
-	args := []string{"git", "restore", "--staged"}
+	args := []string{"restore", "--staged"}
 	if !RepoHasCommits() {
-		args = []string{"git", "rm", "-r", "--cached"}
+		args = []string{"rm", "-r", "--cached"}
 	}
 
 	if len(files) == 0 {
@@ -52,5 +52,5 @@ func Unstage(files ...string) error {
 	}
 	args = append(args, files...)
 
-	return shell.Command(args...).Run()
+	return shell.Command("git", args...).Run()
 }
