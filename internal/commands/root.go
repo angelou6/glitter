@@ -1,6 +1,10 @@
 package commands
 
-import "github.com/urfave/cli/v3"
+import (
+	"glitter/internal/commands/replay"
+
+	"github.com/urfave/cli/v3"
+)
 
 func NewRootCommand() *cli.Command {
 	return &cli.Command{
@@ -15,6 +19,7 @@ func NewRootCommand() *cli.Command {
 			newAddCommand(),
 			newPullCommand(),
 			newOpenCommand(),
+			replay.NewReplayCommand(),
 		},
 	}
 }
