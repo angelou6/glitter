@@ -17,9 +17,9 @@ func amendCommit(messages []string, all bool) error {
 	if len(messages) == 0 {
 		return shell.Command("git", "commit", "--amend", "--no-edit").Run()
 	}
-	args := []string{"git", "commit", "--amend"}
+	args := []string{"commit", "--amend"}
 	args = append(args, git.MessagesToArgs(messages)...)
-	return shell.Command(args...).Run()
+	return shell.Command("git", args...).Run()
 }
 
 func newCommitCommand() *cli.Command {

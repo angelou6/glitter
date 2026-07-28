@@ -15,7 +15,7 @@ func StageAndCommit(messages []string, all bool) error {
 		Stage(".")
 	}
 
-	args := []string{"git", "commit"}
+	args := []string{"commit"}
 	staged := StagedFiles()
 
 	if len(messages) == 0 {
@@ -29,11 +29,11 @@ func StageAndCommit(messages []string, all bool) error {
 			fmt.Sprintf("Changed %d file%s", stagedFiles, plural),
 			fmt.Sprintf("-m Files changed: %s", strings.Join(staged, ", ")),
 		})...)
-		return shell.Command(args...).Run()
+		return shell.Command("git", args...).Run()
 	}
 
 	args = append(args, MessagesToArgs(messages)...)
-	return shell.Command(args...).Run()
+	return shell.Command("git", args...).Run()
 }
 
 func Push(messages []string, force, all bool) error {
