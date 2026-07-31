@@ -1,4 +1,4 @@
-.PHONY: build install uninstall
+.PHONY: build install update uninstall
 
 BIN = glitter
 PREFIX ?= /usr/local
@@ -9,6 +9,9 @@ build:
 
 install: build
 	install -Dm755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
+
+update: build
+	install -Dm755 $(BIN) $(shell which $(BINNAME))
 
 uninstall:
 	rm -f $(shell which $(BINNAME))
