@@ -53,11 +53,12 @@ func parseReplay(replay string) (bool, []string, error) {
 func NewReplayCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "replay",
-		Usage:     "Play and create multiple commands using glitter or git",
+		Usage:     "Play and create sequences of multiple glitter or git commands",
 		ArgsUsage: "<action> [commit]",
 		Commands: []*cli.Command{
 			newCreateCommand(),
 			newArgsCommand(),
+			newOpenCommand(),
 		},
 		Arguments: []cli.Argument{
 			&cli.StringArg{
