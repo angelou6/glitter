@@ -2,26 +2,12 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"glitter/internal/shell"
-	"runtime"
 	"strings"
 
 	"github.com/urfave/cli/v3"
 )
-
-func open(url string) error {
-	switch runtime.GOOS {
-	case "linux":
-		return shell.Command("xdg-open", url).Spawn()
-	case "windows":
-		return shell.Command("cmd", "/c", "start", url).Spawn()
-	case "darwin":
-		return shell.Command("open", url).Spawn()
-	}
-	return errors.New("OS not found")
-}
 
 func getProjectUrl() string {
 	remote, _ := shell.Command("git", "remote", "get-url", "origin").Output()
@@ -53,7 +39,7 @@ func newOpenCommand() *cli.Command {
 				fmt.Println(url)
 				return nil
 			}
-			return open(url)
+			return shell.Open(url)
 		},
 	}
 }
