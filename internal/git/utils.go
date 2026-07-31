@@ -29,3 +29,8 @@ func MessagesToArgs(messages []string) []string {
 
 	return res
 }
+
+func hasUnpushedCommits() bool {
+	log, _ := shell.Command("git", "log", "@{u}..", "--oneline").Output()
+	return len(log) > 0
+}
