@@ -27,7 +27,7 @@ func StageAndCommit(messages []string, all bool) error {
 
 		args = append(args, MessagesToArgs([]string{
 			fmt.Sprintf("Changed %d file%s", stagedFiles, plural),
-			fmt.Sprintf("-m Files changed: %s", strings.Join(staged, ", ")),
+			fmt.Sprintf("Files changed: %s", strings.Join(staged, ", ")),
 		})...)
 		return shell.Command("git", args...).Run()
 	}
