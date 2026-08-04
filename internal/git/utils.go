@@ -22,9 +22,8 @@ func HasChanges() bool {
 
 func MessagesToArgs(messages []string) []string {
 	res := []string{}
-	res = append(res, "-m")
 	for _, m := range messages {
-		res = append(res, m)
+		res = append(res, "-m "+m)
 	}
 
 	return res
