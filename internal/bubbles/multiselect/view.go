@@ -25,7 +25,7 @@ func (m model) View() tea.View {
 		}
 
 		if m.cursor == start+i {
-			builder.WriteString(colorize.Magenta.Tint(checkBox))
+			builder.WriteString(colorize.Blue.Tint(checkBox))
 		} else {
 			builder.WriteString(checkBox)
 		}
