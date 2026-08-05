@@ -37,7 +37,7 @@ func StageAndCommit(messages []string, all bool) error {
 }
 
 func Push(messages []string, force, all bool) error {
-	if !hasUnpushedCommits() {
+	if !hasUnpushedCommits() || len(messages) > 0 {
 		err := StageAndCommit(messages, all)
 		if err != nil {
 			return err
