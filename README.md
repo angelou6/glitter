@@ -1,13 +1,5 @@
 # ✨ Glitter
 
-<!--
-<p align="center">
-  <img src="https://github.com/angelou6/glitter/blob/main/assets/logo.png?raw=true" alt="glitter logo"/>
-</p>
-
----
--->
-
 `Glitter` is a tool that provides some shorcuts that I found useful for solo projects.
 
 ## Why?
@@ -74,6 +66,12 @@ glitter undo push
 
 # Opening the project in the default browser
 glitter open
+
+# Local user setup for repo
+glitter replay create --git user "config user.name username" "config user.email email@email.com"
+
+# Run replay
+glitter replay play user
 ```
 
 ## Instalation
@@ -101,6 +99,19 @@ sudo make install BINNAME=glt
 ### Windows / Mac
 
 Run `go install` or `go build` and place the binary wherever you want.
+
+## Completions
+
+To get completion working, run the following command:
+
+```sh
+glitter completion your-shell-here > completion-location-here/glitter
+```
+
+The completion location varies depending on the shell. Here are the locations of some popular shells:
+
+- fish: `~/.config/fish/completions/`
+- bash: `/usr/share/bash-completion/completions/` or `~/.local/share/bash-completion/completions`
 
 ## Dependencies
 
