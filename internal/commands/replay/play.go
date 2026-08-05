@@ -34,7 +34,7 @@ func parseReplay(replay string) (bool, []string, error) {
 		return false, []string{}, fmt.Errorf("Replay \"%s\" not found", replay)
 	}
 
-	args := strings.Split(string(data), "\n")
+	args := strings.Split(strings.Trim(string(data), "\n"), "\n")
 	if args[0] == "//usegit//" {
 		return true, args[1:], nil
 	}

@@ -42,7 +42,7 @@ func newCreateCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "create",
 		Usage:     "Create a new replay or modify an existing one",
-		ArgsUsage: "<action> [commit]",
+		ArgsUsage: "<action>",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:      "name",
