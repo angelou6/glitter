@@ -3,15 +3,15 @@ package replay
 import (
 	"context"
 	"fmt"
+	"glitter/internal/shell"
 	"os"
-	"path/filepath"
 
 	"github.com/urfave/cli/v3"
 )
 
 func newArgsCommand() *cli.Command {
 	return &cli.Command{
-		Name:      "args",
+		Name:      "show",
 		Usage:     "Show the arguments of a replay",
 		ArgsUsage: "<action> [commit]",
 		Arguments: []cli.Argument{
@@ -20,21 +20,34 @@ func newArgsCommand() *cli.Command {
 				UsageText: "Name of the replay",
 			},
 		},
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "open",
+				Aliases: []string{"o"},
+				Usage:   "Open a replay in the default text editor",
+			},
+		},
+		ShellComplete: fileCompletion,
 		Action: func(ctx context.Context, c *cli.Command) error {
 			replay := c.StringArg("name")
 			if replay == "" {
 				return cli.ShowSubcommandHelp(c)
 			}
 
-			confDir, err := getConfigDir()
+			open := c.Bool("open")
+			dir, err := getFullDir(replay)
 			if err != nil {
 				return err
 			}
-			data, err := os.ReadFile(filepath.Join(confDir, replay))
-			if err != nil {
-				return fmt.Errorf("Replay \"%s\" not found", replay)
+			if open {
+				return shell.Open(dir)
+			} else {
+				data, err := os.ReadFile(dir)
+				if err != nil {
+					return fmt.Errorf("Replay \"%s\" not found", replay)
+				}
+				fmt.Println(string(data))
 			}
-			fmt.Println(string(data))
 
 			return nil
 		},

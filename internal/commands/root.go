@@ -8,15 +8,16 @@ import (
 
 func NewRootCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "glitter",
-		Usage: "Opinionated git shortcuts",
+		Name:                  "glitter",
+		Usage:                 "Opinionated git shortcuts",
+		EnableShellCompletion: true,
 		Commands: []*cli.Command{
 			newInitCommand(),
 			newPublishCommand(),
 			newCommitCommand(),
 			newPushCommand(),
 			newUndoCommand(),
-			newAddCommand(),
+			newStageCommand(),
 			newPullCommand(),
 			newOpenCommand(),
 			replay.NewReplayCommand(),

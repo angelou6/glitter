@@ -3,17 +3,19 @@ package commands
 import (
 	"context"
 	"errors"
+	"fmt"
 	"glitter/internal/bubbles/multiselect"
 	"glitter/internal/git"
 
 	"github.com/urfave/cli/v3"
 )
 
-func newAddCommand() *cli.Command {
+func newStageCommand() *cli.Command {
 	return &cli.Command{
-		Name:      "add",
+		Name:      "stage",
 		Usage:     "Stage or unstage files",
 		ArgsUsage: "[files]",
+		Aliases:   []string{"add"},
 		Arguments: []cli.Argument{
 			&cli.StringArgs{
 				Name:      "files",
@@ -23,14 +25,14 @@ func newAddCommand() *cli.Command {
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:    "revert",
-				Aliases: []string{"r"},
+				Name:    "unstage",
+				Aliases: []string{"u"},
 				Usage:   "Revert staged files",
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			files := c.StringArgs("files")
-			revert := c.Bool("revert")
+			revert := c.Bool("unstage")
 
 			if len(files) == 0 {
 				if !git.HasChanges() {
@@ -52,6 +54,15 @@ func newAddCommand() *cli.Command {
 				git.Stage(files...)
 			}
 			return nil
+		},
+		ShellComplete: func(ctx context.Context, c *cli.Command) {
+			revert := c.Bool("unstage")
+			files := git.ParseStatus()
+			for _, f := range files {
+				if f.IsTracked == revert {
+					fmt.Println(f.Path)
+				}
+			}
 		},
 	}
 }
