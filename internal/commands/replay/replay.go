@@ -58,7 +58,6 @@ func NewReplayCommand() *cli.Command {
 		Commands: []*cli.Command{
 			newCreateCommand(),
 			newArgsCommand(),
-			newOpenCommand(),
 		},
 		Arguments: []cli.Argument{
 			&cli.StringArg{
@@ -71,6 +70,11 @@ func NewReplayCommand() *cli.Command {
 				Name:    "remove",
 				Aliases: []string{"r"},
 				Usage:   "remove a replay",
+			},
+			&cli.BoolFlag{
+				Name:    "open",
+				Aliases: []string{"o"},
+				Usage:   "open a replay in the default text editor",
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
@@ -86,39 +90,47 @@ func NewReplayCommand() *cli.Command {
 					return err
 				}
 
-				for _, e := range entries {
-					fmt.Println(e)
+				if len(entries) > 0 {
+					for _, e := range entries {
+						fmt.Println(e)
+					}
+				} else {
+					cli.ShowSubcommandHelp(c)
 				}
 
 				return nil
 			}
 
 			remove := c.Bool("remove")
-			if remove {
-				dir, err := getFullDir(replay)
-				if err != nil {
-					return err
-				}
+			open := c.Bool("open")
+
+			dir, err := getFullDir(replay)
+			if err != nil {
+				return err
+			}
+
+			switch {
+			case open:
+				return shell.Open(dir)
+			case remove:
 				if err := os.Remove(dir); err != nil {
 					return err
 				}
 				fmt.Println("Deleted successfully")
+			default:
+				usegit, args, err := parseReplay(replay)
+				if err != nil {
+					return err
+				}
+				if usegit {
+					command = "git"
+				}
 
-				return err
-			}
-
-			usegit, args, err := parseReplay(replay)
-			if err != nil {
-				return err
-			}
-			if usegit {
-				command = "git"
-			}
-
-			for _, arg := range args {
-				colorize.Blue.Print("Executing command: ")
-				fmt.Printf("%s %s\n", command, arg)
-				shell.Command(command, strings.Fields(arg)...).Run()
+				for _, arg := range args {
+					colorize.Blue.Print("Executing command: ")
+					fmt.Printf("%s %s\n", command, arg)
+					shell.Command(command, strings.Fields(arg)...).Run()
+				}
 			}
 
 			return nil
