@@ -13,7 +13,7 @@ func newArgsCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "show",
 		Usage:     "Show the arguments of a replay",
-		ArgsUsage: "<action> [commit]",
+		ArgsUsage: "<action>",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:      "name",

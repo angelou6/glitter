@@ -32,10 +32,11 @@ func NewReplayCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "replay",
 		Usage:     "Play and create sequences of multiple glitter or git commands",
-		ArgsUsage: "<action> [commit]",
+		ArgsUsage: "<action>",
 		Commands: []*cli.Command{
 			newPlayCommand(),
 			newCreateCommand(),
+			newRemoveCommand(),
 			newArgsCommand(),
 		},
 	}
