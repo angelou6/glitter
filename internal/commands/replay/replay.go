@@ -31,13 +31,11 @@ func getFullDir(replay string) (string, error) {
 func NewReplayCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "replay",
-		Usage:     "Play and create sequences of multiple glitter or git commands",
+		Usage:     "Play replays",
 		ArgsUsage: "<action>",
 		Commands: []*cli.Command{
 			newPlayCommand(),
-			newCreateCommand(),
-			newRemoveCommand(),
-			newArgsCommand(),
+			newOpenCommand(),
 		},
 	}
 }

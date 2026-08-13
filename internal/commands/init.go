@@ -4,19 +4,9 @@ import (
 	"context"
 	"errors"
 	"glitter/internal/git"
-	"glitter/internal/shell"
 
 	"github.com/urfave/cli/v3"
 )
-
-func initCommand(messages []string, branch string) {
-	shell.Command("git", "init").Run()
-	shell.Command("git", "branch", "-M", branch).Run()
-	if len(messages) == 0 {
-		messages = []string{"Initial commit"}
-	}
-	git.StageAndCommit(messages, true)
-}
 
 func newInitCommand() *cli.Command {
 	return &cli.Command{
@@ -40,7 +30,7 @@ func newInitCommand() *cli.Command {
 			}
 			messages := c.StringSlice("message")
 			branch := c.String("branch")
-			initCommand(messages, branch)
+			git.InitCommand(messages, branch)
 
 			return nil
 		},

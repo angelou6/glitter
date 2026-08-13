@@ -67,12 +67,11 @@ glitter undo push
 # Opening the project in the default browser
 glitter open
 
-# Local user setup for repo
-glitter replay create --git user "config user.name username" "config user.email email@email.com"
-
 # Run replay
 glitter replay play user
 ```
+
+For more information on replays check [replay.md](REPLAY.md).
 
 ## Instalation
 

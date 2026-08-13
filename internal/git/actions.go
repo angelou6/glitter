@@ -1,10 +1,6 @@
 package git
 
-import (
-	"fmt"
-	"glitter/internal/shell"
-	"strings"
-)
+import "glitter/internal/shell"
 
 func Pull() error {
 	return shell.Command("git", "pull").Run()
@@ -16,20 +12,9 @@ func StageAndCommit(messages []string, all bool) error {
 	}
 
 	args := []string{"commit"}
-	staged := StagedFiles()
 
 	if len(messages) == 0 {
-		stagedFiles := len(staged)
-		plural := ""
-		if stagedFiles != 1 {
-			plural = "s"
-		}
-
-		args = append(args, MessagesToArgs([]string{
-			fmt.Sprintf("Changed %d file%s", stagedFiles, plural),
-			fmt.Sprintf("Files changed: %s", strings.Join(staged, ", ")),
-		})...)
-		return shell.Command("git", args...).Run()
+		return shell.Command("git", AutoGenerateMessage()...).Run()
 	}
 
 	args = append(args, MessagesToArgs(messages)...)
@@ -37,7 +22,7 @@ func StageAndCommit(messages []string, all bool) error {
 }
 
 func Push(messages []string, force, all bool) error {
-	if !hasUnpushedCommits() || len(messages) > 0 {
+	if !HasUnpushedCommits() || len(messages) > 0 {
 		err := StageAndCommit(messages, all)
 		if err != nil {
 			return err
@@ -48,4 +33,22 @@ func Push(messages []string, force, all bool) error {
 		return shell.Command("git", "push", "--force").Run()
 	}
 	return shell.Command("git", "push").Run()
+}
+
+func InitCommand(messages []string, branch string) error {
+	err := shell.Command("git", "init").Run()
+	if err != nil {
+		return err
+	}
+
+	err = shell.Command("git", "branch", "-M", branch).Run()
+	if err != nil {
+		return err
+	}
+
+	if len(messages) == 0 {
+		messages = []string{"Initial commit"}
+	}
+
+	return StageAndCommit(messages, true)
 }

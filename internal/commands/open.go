@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
+	"glitter/internal/git"
 	"glitter/internal/shell"
 	"strings"
 
@@ -10,9 +11,7 @@ import (
 )
 
 func getProjectUrl() string {
-	remote, _ := shell.Command("git", "remote", "get-url", "origin").Output()
-	remote = strings.ReplaceAll(strings.TrimSpace(remote), ".git", "")
-	return remote
+	return strings.ReplaceAll(strings.TrimSpace(git.Origin()), ".git", "")
 }
 
 func newOpenCommand() *cli.Command {

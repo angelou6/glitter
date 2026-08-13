@@ -6,7 +6,7 @@ import (
 )
 
 func ParseStatus() []File {
-	status, _ := shell.Command("git", "status", "--porcelain", "-uall").Output()
+	status, _ := shell.Command("git", "status", "--porcelain", "-uall").Output(false)
 	statusFiles := strings.Split(strings.TrimRight(status, "\n"), "\n")
 
 	var files []File

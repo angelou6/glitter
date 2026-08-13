@@ -2,93 +2,72 @@ package replay
 
 import (
 	"context"
-	"fmt"
-	"glitter/internal/colorize"
+	"errors"
 	"glitter/internal/shell"
 	"os"
-	"strings"
 
+	"github.com/d5/tengo/v2"
+	"github.com/d5/tengo/v2/stdlib"
 	"github.com/urfave/cli/v3"
 )
 
-func getConfigEntries() ([]os.DirEntry, error) {
-	confDir, err := getConfigDir()
-	if err != nil {
-		return []os.DirEntry{}, err
-	}
-	entries, err := os.ReadDir(confDir)
-	if err != nil {
-		return []os.DirEntry{}, err
+func execWrapper(args ...tengo.Object) (tengo.Object, error) {
+	commandObj, ok := args[0].(*tengo.String)
+	if !ok {
+		return nil, errors.New("Invalid argument for command")
 	}
 
-	return entries, nil
-}
+	command := commandObj.Value
 
-func parseReplay(replay string) (bool, []string, error) {
-	dir, err := getFullDir(replay)
+	var cmdArgs []string
+	for _, arg := range args[1:] {
+		argObj, ok := arg.(*tengo.String)
+		if !ok {
+			return nil, errors.New("Invalid argument for args")
+		}
+		cmdArgs = append(cmdArgs, argObj.Value)
+	}
+
+	out, err := shell.Command(command, cmdArgs...).Output(false)
 	if err != nil {
-		return false, []string{}, err
-	}
-	data, err := os.ReadFile(dir)
-	if err != nil {
-		return false, []string{}, fmt.Errorf("Replay \"%s\" not found", replay)
+		return nil, err
 	}
 
-	args := strings.Split(strings.Trim(string(data), "\n"), "\n")
-	if args[0] == "//usegit//" {
-		return true, args[1:], nil
-	}
-
-	return false, args, nil
+	return &tengo.String{Value: string(out)}, nil
 }
 
 func newPlayCommand() *cli.Command {
 	return &cli.Command{
-		Name:      "play",
-		Usage:     "Play replay",
-		ArgsUsage: "<action> [commit]",
-		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:      "replay",
-				UsageText: "Name of the replay to play",
-			},
-		},
+		Name:          "play",
+		Usage:         "Play a replay",
+		ArgsUsage:     "<action>",
 		ShellComplete: fileCompletion,
 		Action: func(ctx context.Context, c *cli.Command) error {
-			replay := c.StringArg("replay")
-			if replay == "" {
-				entries, err := getConfigEntries()
-				if err != nil {
-					return err
-				}
-
-				if len(entries) > 0 {
-					for _, e := range entries {
-						fmt.Println(e)
-					}
-				} else {
-					cli.ShowSubcommandHelp(c)
-				}
-
-				return nil
+			if c.Args().Len() == 0 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			command := "glitter"
-			usegit, args, err := parseReplay(replay)
+			dir, _ := getFullDir(c.Args().First())
+			file, err := os.ReadFile(dir)
 			if err != nil {
 				return err
 			}
-			if usegit {
-				command = "git"
-			}
+			script := tengo.NewScript(file)
 
-			for _, arg := range args {
-				colorize.Blue.Print("Executing command: ")
-				fmt.Printf("%s %s\n", command, arg)
-				shell.Command(command, strings.Fields(arg)...).Run()
+			args := c.Args().Slice()[1:]
+			argsSlice := make([]any, len(args))
+			for i, a := range args {
+				argsSlice[i] = a
 			}
+			script.Add("args", argsSlice)
+			script.Add("exec", execWrapper)
+			moduleMap := stdlib.GetModuleMap("fmt")
+			moduleMap.AddBuiltinModule("glitter", Model)
+			script.SetImports(moduleMap)
 
-			return nil
+			_, err = script.Run()
+
+			return err
 		},
 	}
 }
