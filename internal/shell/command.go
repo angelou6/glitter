@@ -23,7 +23,12 @@ func (s shellCommand) Run() error {
 }
 
 // Run command and get output
-func (s shellCommand) Output() (string, error) {
+// silent: Silence stderr
+func (s shellCommand) Output(silent bool) (string, error) {
+	if silent {
+		s.cmd.Stderr = nil
+	}
+
 	out, err := s.cmd.Output()
 	if err != nil {
 		return "", err

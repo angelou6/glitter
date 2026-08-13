@@ -5,6 +5,7 @@ go 1.26.5
 require (
 	charm.land/bubbles/v2 v2.1.1
 	charm.land/bubbletea/v2 v2.0.8
+	github.com/d5/tengo/v2 v2.17.0
 	github.com/urfave/cli/v3 v3.10.1
 )
 
