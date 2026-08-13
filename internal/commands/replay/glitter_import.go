@@ -80,7 +80,7 @@ func push(args ...tengo.Object) (tengo.Object, error) {
 	}
 
 	// Error is ignored because tengo.ToBool converts using thruthy values
-	// Fails anyways, i think
+	// Fails anyways, I think
 	force, _ := tengo.ToBool(args[1])
 	all, _ := tengo.ToBool(args[2])
 

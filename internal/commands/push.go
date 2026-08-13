@@ -39,7 +39,7 @@ func newPushCommand() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:    "force",
-				Usage:   "Force command to execute",
+				Usage:   "Force push",
 				Aliases: []string{"f"},
 			},
 			&cli.BoolFlag{
