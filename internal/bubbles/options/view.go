@@ -2,11 +2,13 @@ package options
 
 import (
 	"fmt"
-	"glitter/internal/colorize"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
+
+var selected = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Magenta)
 
 func (m model) View() tea.View {
 	var builder strings.Builder
@@ -14,7 +16,7 @@ func (m model) View() tea.View {
 	fmt.Fprintf(&builder, "%s:\n", m.prompt)
 	for i, item := range m.options {
 		if i == m.cursor {
-			builder.WriteString(colorize.Magenta.Tint("> "))
+			builder.WriteString(selected.Render("> "))
 		} else {
 			builder.WriteString("  ")
 		}
