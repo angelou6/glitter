@@ -69,7 +69,6 @@ func newPublishCommand() *cli.Command {
 			}
 
 			origin := c.String("origin")
-			// TODO: Error handling here
 			if origin != "" {
 				originalOrigin, _ := shell.Command("git", "config", "--get", "remote.origin.url").Output(false)
 				if originalOrigin != "" {

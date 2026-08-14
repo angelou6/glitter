@@ -5,12 +5,12 @@ go 1.26.5
 require (
 	charm.land/bubbles/v2 v2.1.1
 	charm.land/bubbletea/v2 v2.0.8
+	charm.land/lipgloss/v2 v2.0.6
 	github.com/d5/tengo/v2 v2.17.0
 	github.com/urfave/cli/v3 v3.10.1
 )
 
 require (
-	charm.land/lipgloss/v2 v2.0.6 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260812204455-68fa937c71be // indirect

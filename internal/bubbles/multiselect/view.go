@@ -1,10 +1,16 @@
 package multiselect
 
 import (
-	"glitter/internal/colorize"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+)
+
+var (
+	red   = lipgloss.NewStyle().Foreground(lipgloss.Red)
+	blue  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Blue)
+	green = lipgloss.NewStyle().Foreground(lipgloss.Green)
 )
 
 func (m model) View() tea.View {
@@ -12,20 +18,19 @@ func (m model) View() tea.View {
 
 	start, end := m.paginator.GetSliceBounds(len(m.elements))
 	for i, item := range m.elements[start:end] {
-		var checkBox string
-		var display string
+		var checkBox, display string
 		displayText := item.Display()
 
 		if item.Selected() {
 			checkBox = "[x] "
-			display = colorize.Green.Tint(displayText)
+			display = green.Render(displayText)
 		} else {
 			checkBox = "[ ] "
-			display = colorize.Red.Tint(displayText)
+			display = red.Render(displayText)
 		}
 
 		if m.cursor == start+i {
-			builder.WriteString(colorize.Blue.Tint(checkBox))
+			builder.WriteString(blue.Render(checkBox))
 		} else {
 			builder.WriteString(checkBox)
 		}
