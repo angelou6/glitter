@@ -61,6 +61,9 @@ glitter push -m "fix: it compiles now"
 # Amending the last push with new stuff
 glitter push --amend
 
+# Auto generate a commit message
+glitter push
+
 # Removing the lates push from remote
 glitter undo push
 
@@ -110,7 +113,7 @@ glitter completion your-shell-here > completion-location-here/glitter
 The completion location varies depending on the shell. Here are the locations of some popular shells:
 
 - fish: `~/.config/fish/completions/`
-- bash: `/usr/share/bash-completion/completions/` or `~/.local/share/bash-completion/completions`
+- bash: `/usr/share/bash-completion/completions/` or `~/.local/share/bash-completion/completions/`
 
 ## Dependencies
 
