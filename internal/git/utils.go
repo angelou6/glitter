@@ -2,9 +2,10 @@ package git
 
 import (
 	"fmt"
-	"glitter/internal/shell"
 	"slices"
 	"strings"
+
+	"glitter/internal/shell"
 )
 
 func Origin() string {

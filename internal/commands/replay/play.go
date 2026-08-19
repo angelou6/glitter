@@ -3,8 +3,9 @@ package replay
 import (
 	"context"
 	"errors"
-	"glitter/internal/shell"
 	"os"
+
+	"glitter/internal/shell"
 
 	"github.com/d5/tengo/v2"
 	"github.com/d5/tengo/v2/stdlib"

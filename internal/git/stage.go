@@ -1,8 +1,9 @@
 package git
 
 import (
-	"glitter/internal/shell"
 	"strings"
+
+	"glitter/internal/shell"
 )
 
 func ParseStatus() []File {

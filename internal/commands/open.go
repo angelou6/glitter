@@ -3,9 +3,10 @@ package commands
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"glitter/internal/git"
 	"glitter/internal/shell"
-	"strings"
 
 	"github.com/urfave/cli/v3"
 )

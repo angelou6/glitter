@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"glitter/internal/bubbles/confirm"
 	"glitter/internal/bubbles/input"
 	"glitter/internal/bubbles/options"
 	"glitter/internal/git"
 	"glitter/internal/shell"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/urfave/cli/v3"
 )
@@ -101,7 +102,8 @@ func newPublishCommand() *cli.Command {
 				return github(name, desc, private)
 			}
 
-			name, err := input.New("Name", cwd(),
+			name, err := input.New(
+				"Name", cwd(),
 				func(s string) error {
 					if strings.Contains(s, " ") {
 						return errors.New("Cannot contain spaces")
