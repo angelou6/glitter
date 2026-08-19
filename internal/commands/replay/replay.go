@@ -1,9 +1,10 @@
 package replay
 
 import (
-	"glitter/internal/shell"
 	"os"
 	"path/filepath"
+
+	"glitter/internal/shell"
 
 	"github.com/urfave/cli/v3"
 )
@@ -12,7 +13,7 @@ func getConfigDir() (string, error) {
 	home, _ := os.UserConfigDir()
 	confDir := filepath.Join(home, "glitter")
 	if !shell.DirExists(confDir) {
-		if err := os.Mkdir(confDir, 0755); err != nil {
+		if err := os.Mkdir(confDir, 0o755); err != nil {
 			return "", err
 		}
 	}

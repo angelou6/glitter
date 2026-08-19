@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"glitter/internal/commands"
 	"os"
+
+	"glitter/internal/commands"
 
 	"github.com/urfave/cli/v3"
 )
