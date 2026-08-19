@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"glitter/internal/shell"
+	"slices"
 	"strings"
 )
 
@@ -51,14 +52,13 @@ func AutoGenerateMessage() []string {
 	args := []string{"commit"}
 	staged := StagedFiles()
 
-	stagedFiles := len(staged)
-	plural := ""
-	if stagedFiles != 1 {
-		plural = "s"
+	stagedLen := len(staged)
+	if stagedLen == 1 {
+		return append(args, fmt.Sprintf("-m Changed %s", staged[0]))
 	}
 
-	return append(args, MessagesToArgs([]string{
-		fmt.Sprintf("Changed %d file%s", stagedFiles, plural),
-		fmt.Sprintf("Files changed: %s", strings.Join(staged, ", ")),
-	})...)
+	return slices.Concat(args, []string{
+		fmt.Sprintf("-m Changed %d files", stagedLen),
+		fmt.Sprintf("-m Files changed: %s", strings.Join(staged, ", ")),
+	})
 }
