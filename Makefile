@@ -5,7 +5,7 @@ PREFIX ?= /usr/local
 BINNAME ?= glitter
 
 build:
-	go build -ldflags="-s -w" -trimpath
+	CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath
 
 install: build
 	install -Dm755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BINNAME)
