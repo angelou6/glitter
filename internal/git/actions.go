@@ -35,7 +35,7 @@ func Push(messages []string, force, all bool) error {
 	return shell.Command("git", "push").Run()
 }
 
-func InitCommand(messages []string, branch string) error {
+func Initialize(branch string) error {
 	err := shell.Command("git", "init").Run()
 	if err != nil {
 		return err
@@ -46,9 +46,5 @@ func InitCommand(messages []string, branch string) error {
 		return err
 	}
 
-	if len(messages) == 0 {
-		messages = []string{"Initial commit"}
-	}
-
-	return StageAndCommit(messages, true)
+	return nil
 }

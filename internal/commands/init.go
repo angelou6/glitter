@@ -4,16 +4,20 @@ import (
 	"context"
 	"errors"
 
-	"glitter/internal/git"
-
 	"github.com/urfave/cli/v3"
+	"glitter/internal/git"
 )
 
 func newInitCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "init",
-		Usage: "Initialize a git repo",
+		Usage: "Initialize a git repo and commit",
 		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "no-commit",
+				Aliases: []string{"n"},
+				Usage:   "Initialize the repo without commiting",
+			},
 			&cli.StringSliceFlag{
 				Name:    "message",
 				Aliases: []string{"m"},
@@ -29,10 +33,18 @@ func newInitCommand() *cli.Command {
 			if git.IsRepo() {
 				return errors.New("This directory has already been initialized")
 			}
-			messages := c.StringSlice("message")
+			noCommit := c.Bool("no-commit")
 			branch := c.String("branch")
-			git.InitCommand(messages, branch)
+			messages := c.StringSlice("message")
 
+			git.Initialize(branch)
+
+			if !noCommit {
+				if len(messages) == 0 {
+					messages = []string{"Initial commit"}
+				}
+				return git.StageAndCommit(messages, true)
+			}
 			return nil
 		},
 	}
