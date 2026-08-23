@@ -114,24 +114,8 @@ func commit(args ...tengo.Object) (tengo.Object, error) {
 }
 
 func glitter_init(args ...tengo.Object) (tengo.Object, error) {
-	if len(args) != 2 {
+	if len(args) != 1 {
 		return nil, tengo.ErrWrongNumArguments
-	}
-
-	arr, ok := args[0].(*tengo.Array)
-	if !ok {
-		return nil, tengo.ErrInvalidArgumentType{
-			Name: "messages", Expected: "array", Found: args[0].TypeName(),
-		}
-	}
-	messages := make([]string, len(arr.Value))
-	for i, v := range arr.Value {
-		messages[i], ok = tengo.ToString(v)
-		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
-				Name: "messages", Expected: "string", Found: v.TypeName(),
-			}
-		}
 	}
 
 	branch, ok := tengo.ToString(args[1])
@@ -141,7 +125,7 @@ func glitter_init(args ...tengo.Object) (tengo.Object, error) {
 		}
 	}
 
-	return nil, git.InitCommand(messages, branch)
+	return nil, git.Initialize(branch)
 }
 
 func input_prompt(args ...tengo.Object) (tengo.Object, error) {
