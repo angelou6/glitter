@@ -80,22 +80,14 @@ For more information on replays check [replay.md](REPLAY.md).
 
 ### Linux
 
-On `/usr/local/bin/`
+Use the included [./install.sh](install.sh) script.
 
-```sh
-sudo make install
+Here is the help message for that script:
+
 ```
-
-On `~/.local/bin`:
-
-```sh
-make install PREFIX=~/.local
-```
-
-You can also change the name of the binary like this:
-
-```sh
-sudo make install BINNAME=glt
+-t	Target of the installation (default: ~/.local/bin)
+-n	Name of the installed binary (default: glitter)
+-u	Uninstall glitter
 ```
 
 ### Windows / Mac
