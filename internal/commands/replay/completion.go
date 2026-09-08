@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func getConfigEntries() ([]os.DirEntry, error) {
+func getReplayEntries() ([]os.DirEntry, error) {
 	confDir, err := getConfigDir()
 	if err != nil {
 		return []os.DirEntry{}, err
@@ -26,7 +26,7 @@ func fileCompletion(_ context.Context, c *cli.Command) {
 		return
 	}
 
-	entries, _ := getConfigEntries()
+	entries, _ := getReplayEntries()
 	for _, e := range entries {
 		fmt.Println(e.Name())
 	}

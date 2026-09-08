@@ -26,6 +26,7 @@ func getFullDir(replay string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return filepath.Join(confDir, replay), nil
 }
 
@@ -37,6 +38,7 @@ func NewReplayCommand() *cli.Command {
 		Commands: []*cli.Command{
 			newPlayCommand(),
 			newOpenCommand(),
+			newListCommand(),
 		},
 	}
 }
