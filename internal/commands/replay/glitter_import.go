@@ -16,7 +16,28 @@ var Model = map[string]tengo.Object{
 	"init":         &tengo.UserFunction{Name: "init", Value: glitter_init},
 	"confirm":      &tengo.UserFunction{Name: "confirm", Value: confirm_prompt},
 	"input":        &tengo.UserFunction{Name: "input", Value: input_prompt},
+	"stage":        &tengo.UserFunction{Name: "stage", Value: stage},
 	"staged":       &tengo.UserFunction{Name: "staged", Value: staged},
+}
+
+func toStringSlice(arg tengo.Object) ([]string, error) {
+	arr, ok := arg.(*tengo.Array)
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name: "messages", Expected: "array", Found: arg.TypeName(),
+		}
+	}
+	stringSlice := make([]string, len(arr.Value))
+	for i, v := range arr.Value {
+		stringSlice[i], ok = tengo.ToString(v)
+		if !ok {
+			return nil, tengo.ErrInvalidArgumentType{
+				Name: "messages", Expected: "string", Found: v.TypeName(),
+			}
+		}
+	}
+
+	return stringSlice, nil
 }
 
 func info(args ...tengo.Object) (tengo.Object, error) {
@@ -26,10 +47,7 @@ func info(args ...tengo.Object) (tengo.Object, error) {
 		"has_changes": git.HasChanges(),
 		"origin":      git.Origin(),
 	})
-	if err != nil {
-		return nil, err
-	}
-	return obj, nil
+	return obj, err
 }
 
 func staged(args ...tengo.Object) (tengo.Object, error) {
@@ -63,20 +81,9 @@ func push(args ...tengo.Object) (tengo.Object, error) {
 		return nil, tengo.ErrWrongNumArguments
 	}
 
-	arr, ok := args[0].(*tengo.Array)
-	if !ok {
-		return nil, tengo.ErrInvalidArgumentType{
-			Name: "messages", Expected: "array", Found: args[0].TypeName(),
-		}
-	}
-	messages := make([]string, len(arr.Value))
-	for i, v := range arr.Value {
-		messages[i], ok = tengo.ToString(v)
-		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
-				Name: "messages", Expected: "string", Found: v.TypeName(),
-			}
-		}
+	messages, err := toStringSlice(args[0])
+	if err != nil {
+		return nil, err
 	}
 
 	// Error is ignored because tengo.ToBool converts using thruthy values
@@ -92,25 +99,30 @@ func commit(args ...tengo.Object) (tengo.Object, error) {
 		return nil, tengo.ErrWrongNumArguments
 	}
 
-	arr, ok := args[0].(*tengo.Array)
-	if !ok {
-		return nil, tengo.ErrInvalidArgumentType{
-			Name: "messages", Expected: "array", Found: args[0].TypeName(),
-		}
+	messages, err := toStringSlice(args[0])
+	if err != nil {
+		return nil, err
 	}
-	messages := make([]string, len(arr.Value))
-	for i, v := range arr.Value {
-		messages[i], ok = tengo.ToString(v)
-		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
-				Name: "messages", Expected: "string", Found: v.TypeName(),
-			}
-		}
-	}
-
 	all, _ := tengo.ToBool(args[1])
 
 	return nil, git.StageAndCommit(messages, all)
+}
+
+func stage(args ...tengo.Object) (tengo.Object, error) {
+	if len(args) != 2 {
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	files, err := toStringSlice(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	unstage, _ := tengo.ToBool(args[1])
+	if unstage {
+		return nil, git.Unstage(files...)
+	}
+	return nil, git.Stage(files...)
 }
 
 func glitter_init(args ...tengo.Object) (tengo.Object, error) {

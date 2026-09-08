@@ -50,11 +50,9 @@ func newStageCommand() *cli.Command {
 			}
 
 			if revert {
-				git.Unstage(files...)
-			} else {
-				git.Stage(files...)
+				return git.Unstage(files...)
 			}
-			return nil
+			return git.Stage(files...)
 		},
 		ShellComplete: func(ctx context.Context, c *cli.Command) {
 			revert := c.Bool("unstage")

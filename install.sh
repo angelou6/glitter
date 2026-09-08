@@ -37,4 +37,4 @@ installdir=${target%/}/$targetbin
 echo "Installing to $installdir..."
 install -Dm755 glitter $installdir
 
-echo 'Done'
+echo 'Done!'

@@ -36,10 +36,11 @@ func StagedFiles() []string {
 	return staged
 }
 
-func Stage(files ...string) {
+func Stage(files ...string) error {
 	args := []string{"add"}
 	args = append(args, files...)
-	shell.Command("git", args...).Run()
+
+	return shell.Command("git", args...).Run()
 }
 
 func Unstage(files ...string) error {

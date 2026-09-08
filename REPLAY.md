@@ -12,14 +12,17 @@ fmt.println(glitter.info()) // Info about the repo
 fmt.println(glitter.gen_messages()) // Auto generates commit message from staged files
 fmt.println(glitter.staged()) // Array with staged files
 
-// arg1: message, arg2: Ignore staged files and stage all
+// arg1: messages, arg2: Ignore staged files and stage all
 glitter.commit(["cool", "commit"], true)
 
 // arg1: message, arg2: Force command to execute, arg3: Ignore staged files and stage all
 glitter.push(["cool", "commit"], false, true)
 
-// arg1: message, arg2: branch
-glitter.init(["cool", "commit"], "main")
+// arg1: files to stage, arg2: Should unstage the files instead
+glitter.stage(["file1", "file2"], false)
+
+// arg1: branch
+glitter.init("main")
 ```
 
 You are also given the arguments passed to the CLI when making the call.
