@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/urfave/cli/v3"
 	"glitter/internal/git"
+
+	"github.com/urfave/cli/v3"
 )
 
 func newInitCommand() *cli.Command {
