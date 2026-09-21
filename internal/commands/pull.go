@@ -20,7 +20,7 @@ func ForcePull() error {
 	return shell.Command("git", "clean", "-fd").Run()
 }
 
-func newPullCommand() *cli.Command {
+func pullCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "pull",
 		Usage: "Pull changes from remote",

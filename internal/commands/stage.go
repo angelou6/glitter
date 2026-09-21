@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func newStageCommand() *cli.Command {
+func stageCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "stage",
 		Usage:     "Stage or unstage files",

@@ -23,7 +23,7 @@ func amendCommit(messages []string, all bool) error {
 	return shell.Command("git", args...).Run()
 }
 
-func newCommitCommand() *cli.Command {
+func commitCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "commit",
 		Usage: "Stage all files and commit",

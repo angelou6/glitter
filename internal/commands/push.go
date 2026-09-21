@@ -20,7 +20,7 @@ func amendPush(messages []string, force, all bool) error {
 	return shell.Command("git", "push", "--force-with-lease").Run()
 }
 
-func newPushCommand() *cli.Command {
+func pushCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "push",
 		Usage: "Stage, commit, and push changes",
