@@ -18,7 +18,7 @@ import (
 )
 
 func pushToOrigin() error {
-	branch, _ := shell.Command("git", "branch", "--show-current").Output(false)
+	branch, _ := shell.Command("git", "branch", "--show-current").Output()
 	return shell.Command("git", "push", "-u", "origin", strings.TrimSpace(branch)).Run()
 }
 
@@ -71,7 +71,7 @@ func newPublishCommand() *cli.Command {
 
 			origin := c.String("origin")
 			if origin != "" {
-				originalOrigin, _ := shell.Command("git", "config", "--get", "remote.origin.url").Output(false)
+				originalOrigin, _ := shell.Command("git", "config", "--get", "remote.origin.url").Output()
 				if originalOrigin != "" {
 					fmt.Printf("An origin already exists (%s)\n", originalOrigin)
 					res, _ := confirm.Run(fmt.Sprintf("Do you want to replace it with %s?", origin))

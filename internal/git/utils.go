@@ -9,7 +9,7 @@ import (
 )
 
 func Origin() string {
-	remote, err := shell.Command("git", "remote", "get-url", "origin").Output(true)
+	remote, err := shell.Command("git", "remote", "get-url", "origin").Silent().Output()
 	if err != nil {
 		return ""
 	}
@@ -17,7 +17,7 @@ func Origin() string {
 }
 
 func RepoHasCommits() bool {
-	if _, err := shell.Command("git", "rev-parse", "--verify", "HEAD").Output(true); err != nil {
+	if _, err := shell.Command("git", "rev-parse", "--verify", "HEAD").Silent().Output(); err != nil {
 		return false
 	}
 	return true
@@ -28,7 +28,7 @@ func IsRepo() bool {
 }
 
 func HasChanges() bool {
-	out, err := shell.Command("git", "status", "--porcelain").Output(true)
+	out, err := shell.Command("git", "status", "--porcelain").Silent().Output()
 	if err != nil {
 		return false
 	}
@@ -45,7 +45,7 @@ func MessagesToArgs(messages []string) []string {
 }
 
 func HasUnpushedCommits() bool {
-	log, _ := shell.Command("git", "log", "@{u}..", "--oneline").Output(false)
+	log, _ := shell.Command("git", "log", "@{u}..", "--oneline").Output()
 	return len(log) > 0
 }
 
