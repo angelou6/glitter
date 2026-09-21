@@ -2,7 +2,6 @@ package commands
 
 import (
 	"glitter/internal/commands/clone"
-	"glitter/internal/commands/replay"
 
 	"github.com/urfave/cli/v3"
 )
@@ -22,7 +21,6 @@ func NewRootCommand() *cli.Command {
 			newPullCommand(),
 			newOpenCommand(),
 			clone.CloneCommand(),
-			replay.NewReplayCommand(),
 		},
 	}
 }

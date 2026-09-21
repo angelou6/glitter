@@ -69,12 +69,7 @@ glitter undo push
 
 # Opening the project in the default browser
 glitter open
-
-# Run replay
-glitter replay play user
 ```
-
-For more information on replays check [replay.md](REPLAY.md).
 
 ## Instalation
 

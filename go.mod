@@ -6,7 +6,6 @@ require (
 	charm.land/bubbles/v2 v2.2.1
 	charm.land/bubbletea/v2 v2.0.9
 	charm.land/lipgloss/v2 v2.0.6
-	github.com/d5/tengo/v2 v2.17.0
 	github.com/urfave/cli/v3 v3.11.0
 )
 
