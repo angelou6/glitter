@@ -64,5 +64,11 @@ func undoCommand() *cli.Command {
 			}
 			return fmt.Errorf("Action '%s' is invalid", action)
 		},
+		ShellComplete: func(ctx context.Context, c *cli.Command) {
+			if c.NArg() == 0 {
+				fmt.Println("commit")
+				fmt.Println("push")
+			}
+		},
 	}
 }
