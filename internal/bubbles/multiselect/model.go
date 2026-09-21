@@ -10,8 +10,8 @@ const perPage = 10
 type Element interface {
 	Display() string
 	Selected() bool
-	Stage()
-	Unstage()
+	Select()
+	Unselect()
 }
 
 type model struct {
@@ -24,12 +24,20 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func New(elements []Element) model {
+func New[T any, PT interface {
+	*T
+	Element
+}](elements []T) model {
 	p := paginator.New(paginator.WithPerPage(perPage))
 	p.Type = paginator.Dots
 	p.SetTotalPages(len(elements))
 
-	return model{elements: elements, paginator: p}
+	elems := make([]Element, len(elements))
+	for i := range elements {
+		elems[i] = PT(&elements[i])
+	}
+
+	return model{elements: elems, paginator: p}
 }
 
 func (m model) Run() error {

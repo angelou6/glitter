@@ -41,12 +41,7 @@ func newStageCommand() *cli.Command {
 				}
 
 				files := git.ParseStatus()
-				elems := make([]multiselect.Element, len(files))
-				for i := range files {
-					elems[i] = &files[i]
-				}
-
-				return multiselect.New(elems).Run()
+				return multiselect.New(files).Run()
 			}
 
 			if revert {
