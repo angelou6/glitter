@@ -29,7 +29,7 @@ func execWrapper(args ...tengo.Object) (tengo.Object, error) {
 		cmdArgs = append(cmdArgs, argObj.Value)
 	}
 
-	out, err := shell.Command(command, cmdArgs...).Output(false)
+	out, err := shell.Command(command, cmdArgs...).Output()
 	if err != nil {
 		return nil, err
 	}

@@ -6,26 +6,35 @@ import (
 )
 
 type shellCommand struct {
-	cmd *exec.Cmd
+	cmd    *exec.Cmd
+	silent bool
+}
+
+// Make command silent
+func (s shellCommand) Silent() shellCommand {
+	s.silent = true
+	return s
 }
 
 func Command(command string, args ...string) shellCommand {
 	cmd := exec.Command(command, args...)
 	cmd.Stderr = os.Stderr
 
-	return shellCommand{cmd}
+	return shellCommand{cmd, false}
 }
 
 // Run command
 func (s shellCommand) Run() error {
-	s.cmd.Stdout = os.Stdout
+	if !s.silent {
+		s.cmd.Stdout = os.Stdout
+	}
 	return s.cmd.Run()
 }
 
 // Run command and get output
-// silent: Silence stderr
-func (s shellCommand) Output(silent bool) (string, error) {
-	if silent {
+// Using silence suppresses stderr
+func (s shellCommand) Output() (string, error) {
+	if s.silent {
 		s.cmd.Stderr = nil
 	}
 
@@ -38,6 +47,9 @@ func (s shellCommand) Output(silent bool) (string, error) {
 
 // Run command detached from main process
 func (s shellCommand) Spawn() error {
+	if s.silent {
+		s.cmd.Stderr = nil
+	}
 	return s.cmd.Start()
 }
 
