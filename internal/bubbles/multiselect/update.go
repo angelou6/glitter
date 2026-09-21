@@ -11,16 +11,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "a":
 			for _, element := range m.elements {
 				if element.Selected() {
-					element.Stage()
+					element.Select()
 				} else {
-					element.Unstage()
+					element.Unselect()
 				}
 			}
 		case "enter", "space":
 			if m.elements[m.cursor].Selected() {
-				m.elements[m.cursor].Stage()
+				m.elements[m.cursor].Select()
 			} else {
-				m.elements[m.cursor].Unstage()
+				m.elements[m.cursor].Unselect()
 			}
 		case "down", "j":
 			m.cursor = min(len(m.elements)-1, m.cursor+1)

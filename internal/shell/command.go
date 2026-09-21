@@ -25,7 +25,9 @@ func Command(command string, args ...string) shellCommand {
 
 // Run command
 func (s shellCommand) Run() error {
-	if !s.silent {
+	if s.silent {
+		s.cmd.Stderr = nil
+	} else {
 		s.cmd.Stdout = os.Stdout
 	}
 	return s.cmd.Run()

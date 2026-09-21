@@ -12,6 +12,7 @@ import (
 	"glitter/internal/bubbles/input"
 	"glitter/internal/bubbles/options"
 	"glitter/internal/git"
+	"glitter/internal/github"
 	"glitter/internal/shell"
 
 	"github.com/urfave/cli/v3"
@@ -20,17 +21,6 @@ import (
 func pushToOrigin() error {
 	branch, _ := shell.Command("git", "branch", "--show-current").Output()
 	return shell.Command("git", "push", "-u", "origin", strings.TrimSpace(branch)).Run()
-}
-
-func github(name, desc string, private bool) error {
-	args := []string{"repo", "create", name, "--description", desc, "--source", ".", "--remote=origin", "--push"}
-	if private {
-		args = append(args, "--private")
-	} else {
-		args = append(args, "--public")
-	}
-
-	return shell.Command("gh", args...).Run()
 }
 
 func cwd() string {
@@ -99,7 +89,7 @@ func newPublishCommand() *cli.Command {
 					return errors.New("Name needs to be given for this command")
 				}
 
-				return github(name, desc, private)
+				return github.Publish(name, desc, private)
 			}
 
 			name, err := input.New(
@@ -125,7 +115,7 @@ func newPublishCommand() *cli.Command {
 				return err
 			}
 
-			return github(name, desc, visibility == "private")
+			return github.Publish(name, desc, visibility == "private")
 		},
 	}
 }

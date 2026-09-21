@@ -13,12 +13,12 @@ func (f File) Selected() bool {
 	return f.IsTracked
 }
 
-func (f *File) Stage() {
+func (f *File) Select() {
 	Unstage(f.Path)
 	f.IsTracked = false
 }
 
-func (f *File) Unstage() {
+func (f *File) Unselect() {
 	Stage(f.Path)
 	f.IsTracked = true
 }
