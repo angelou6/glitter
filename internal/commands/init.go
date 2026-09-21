@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func newInitCommand() *cli.Command {
+func initCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "init",
 		Usage: "Initialize a git repo and commit",

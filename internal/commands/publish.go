@@ -32,7 +32,7 @@ func cwd() string {
 	return filepath.Base(dir)
 }
 
-func newPublishCommand() *cli.Command {
+func publishCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "publish",
 		Usage: "Publish to github or origin",

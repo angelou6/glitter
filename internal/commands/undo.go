@@ -29,7 +29,7 @@ func undoPush(hard bool, commit string) error {
 	return shell.Command("git", "push", "--force-with-lease").Run()
 }
 
-func newUndoCommand() *cli.Command {
+func undoCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "undo",
 		Usage:     "Undo an action",

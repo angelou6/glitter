@@ -22,7 +22,7 @@ func formatURL(url, commit string) string {
 	return fmt.Sprintf("%s/commit/%s", url, commit)
 }
 
-func newOpenCommand() *cli.Command {
+func openCommand() *cli.Command {
 	return &cli.Command{
 		Name:      "open",
 		Usage:     "Open the repository in the default web browser",
