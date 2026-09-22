@@ -6,7 +6,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
 		switch msg.String() {
-		case "ctrl+c", "ctrl+d", "q", "esc":
+		case "ctrl+c", "ctrl+d", "enter", "q", "esc":
 			return m, tea.Quit
 		case "a":
 			for _, element := range m.elements {
@@ -16,7 +16,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					element.Unselect()
 				}
 			}
-		case "enter", "space":
+		case "space":
 			if m.elements[m.cursor].Selected() {
 				m.elements[m.cursor].Select()
 			} else {
