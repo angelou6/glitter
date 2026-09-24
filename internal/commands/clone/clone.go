@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"sync"
+
 	"glitter/internal/bubbles/multiselect"
 	"glitter/internal/github"
 	"glitter/internal/shell"
-	"os"
-	"sync"
 
 	"github.com/urfave/cli/v3"
 )

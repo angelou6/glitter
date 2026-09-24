@@ -75,7 +75,7 @@ glitter open
 
 ### Linux
 
-Use the included [./install.sh](install.sh) script.
+Use the included [install.sh](install.sh) script.
 
 Here is the help message for that script:
 
