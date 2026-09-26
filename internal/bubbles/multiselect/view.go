@@ -8,32 +8,29 @@ import (
 )
 
 var (
-	red   = lipgloss.NewStyle().Foreground(lipgloss.BrightRed)
-	blue  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Blue)
-	green = lipgloss.NewStyle().Foreground(lipgloss.Green)
-	grey  = lipgloss.NewStyle().Foreground(lipgloss.BrightBlack)
+	orange = lipgloss.NewStyle().Foreground(lipgloss.Color("202")).Render
+	blue   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Blue).Render
+	green  = lipgloss.NewStyle().Foreground(lipgloss.Green).Render
+	grey   = lipgloss.NewStyle().Foreground(lipgloss.BrightBlack).Render
 )
 
 func (m model) View() tea.View {
 	var builder strings.Builder
 
 	start, end := m.paginator.GetSliceBounds(len(m.elements))
-	builder.WriteString(grey.Render("Return to accept | Space to toggle | 'a' to toggle all"))
+	builder.WriteString(grey("Return to accept | Space to toggle | 'a' to toggle all"))
 	builder.WriteRune('\n')
 	for i, item := range m.elements[start:end] {
-		var checkBox, display string
-		displayText := item.Display()
+		checkBox := "[ ] "
+		display := orange(item.Display())
 
 		if item.Selected() {
 			checkBox = "[x] "
-			display = green.Render(displayText)
-		} else {
-			checkBox = "[ ] "
-			display = red.Render(displayText)
+			display = green(item.Display())
 		}
 
 		if m.cursor == start+i {
-			builder.WriteString(blue.Render(checkBox))
+			builder.WriteString(blue(checkBox))
 		} else {
 			builder.WriteString(checkBox)
 		}
