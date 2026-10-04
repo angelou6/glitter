@@ -40,13 +40,13 @@ glitter init
 glitter publish -o https://github.com/angelou6/glitter.git
 ```
 
----
+<!-----
 
 `Glitter` also has some small TUIs to help with publishing and staging:
 
 | Stage                           | Publish                             |
 | ------------------------------- | ----------------------------------- |
-| ![stage tui](/assets/stage.png) | ![publish tui](/assets/publish.png) |
+| ![stage tui](/assets/stage.png) | ![publish tui](/assets/publish.png) |-->
 
 ## Example usage
 
