@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"glitter/internal/bubbles/multiselect"
-	"glitter/internal/github"
+	"glitter/internal/platform"
 	"glitter/internal/shell"
 
 	"github.com/urfave/cli/v3"
@@ -16,7 +16,7 @@ import (
 
 func parseRepos() ([]Repo, error) {
 	var userRepos []Repo
-	repos, err := github.GetRepos()
+	repos, err := platform.GetRepos()
 	if err != nil {
 		return []Repo{}, err
 	}

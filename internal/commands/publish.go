@@ -12,7 +12,7 @@ import (
 	"glitter/internal/bubbles/input"
 	"glitter/internal/bubbles/options"
 	"glitter/internal/git"
-	"glitter/internal/github"
+	"glitter/internal/platform"
 	"glitter/internal/shell"
 
 	"github.com/urfave/cli/v3"
@@ -37,6 +37,10 @@ func publishCommand() *cli.Command {
 		Name:  "publish",
 		Usage: "Publish to github or origin",
 		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "codeberg",
+				Aliases: []string{"c"},
+			},
 			&cli.StringFlag{
 				Name:    "name",
 				Aliases: []string{"n"},
@@ -76,8 +80,9 @@ func publishCommand() *cli.Command {
 				return nil
 			}
 
-			if !shell.Exists("gh") {
-				return errors.New("github-cli not found")
+			useCodeberg := c.Bool("codeberg")
+			if err := platform.CheckExistance(useCodeberg); err != nil {
+				return err
 			}
 
 			if c.IsSet("name") || c.IsSet("desc") || c.IsSet("private") {
@@ -89,7 +94,15 @@ func publishCommand() *cli.Command {
 					return errors.New("Name needs to be given for this command")
 				}
 
-				return github.Publish(name, desc, private)
+				if useCodeberg {
+					return platform.Publish(platform.Codeberg, name, desc, private)
+				}
+				return platform.Publish(platform.GitHub, name, desc, private)
+			}
+
+			publishPlatform, err := options.New("Publish platform", []string{"github", "codeberg"}).Run()
+			if err != nil {
+				return err
 			}
 
 			name, err := input.New(
@@ -115,7 +128,10 @@ func publishCommand() *cli.Command {
 				return err
 			}
 
-			return github.Publish(name, desc, visibility == "private")
+			if publishPlatform == "codeberg" {
+				return platform.Publish(platform.Codeberg, name, desc, visibility == "private")
+			}
+			return platform.Publish(platform.GitHub, name, desc, visibility == "private")
 		},
 	}
 }
