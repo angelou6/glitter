@@ -54,5 +54,5 @@ func Unstage(files ...string) error {
 	}
 	args = append(args, files...)
 
-	return shell.Command("git", args...).Run()
+	return shell.Command("git", args...).Silent().Run()
 }
