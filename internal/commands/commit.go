@@ -34,10 +34,6 @@ func commitCommand() *cli.Command {
 				Aliases: []string{"m"},
 			},
 			&cli.BoolFlag{
-				Name:  "automessage",
-				Usage: "Auto generates a commit message",
-			},
-			&cli.BoolFlag{
 				Name:  "amend",
 				Usage: "Amend all new modifications to latest",
 			},
