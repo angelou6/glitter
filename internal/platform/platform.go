@@ -1,7 +1,6 @@
 package platform
 
 import (
-	"errors"
 	"glitter/internal/shell"
 )
 
@@ -12,17 +11,15 @@ const (
 	Codeberg
 )
 
-func CheckExistance(use_codeberg bool) error {
-	if use_codeberg && !shell.Exists("fj") {
-		return errors.New("forgejo-cli is missing")
-	} else if !shell.Exists("gh") {
-		return errors.New("github-cli is missing")
-	}
-	return nil
+func GithubCliExists() bool {
+	return shell.Exists("gh")
 }
 
-// Get repositories from platform
-// GitHub only
+func ForgejoCliExists() bool {
+	return shell.Exists("fj")
+}
+
+// Get repositories from platform. GitHub only
 func GetRepos() (string, error) {
 	return shell.Command("gh", "repo", "ls", "--json", "name,url").Output()
 }

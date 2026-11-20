@@ -59,8 +59,26 @@ func publishCommand() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
+			platforms := []string{}
+			if platform.ForgejoCliExists() {
+				platforms = append(platforms, "codeberg")
+			}
+			if platform.GithubCliExists() {
+				platforms = append(platforms, "github")
+			}
+
+			if len(platforms) == 0 {
+				return errors.New("No cli for publishing was found.")
+			}
+
 			if !git.IsRepo() {
-				return errors.New("This is not a repo")
+				res, _ := confirm.Run("This is not a repo, do you want to initialize it")
+				if res {
+					git.Initialize("main")
+					fmt.Println("New repo initialized with main branch.")
+				} else {
+					return errors.New("This is not a repo")
+				}
 			}
 
 			origin := c.String("origin")
@@ -81,10 +99,6 @@ func publishCommand() *cli.Command {
 			}
 
 			useCodeberg := c.Bool("codeberg")
-			if err := platform.CheckExistance(useCodeberg); err != nil {
-				return err
-			}
-
 			if c.IsSet("name") || c.IsSet("desc") || c.IsSet("private") {
 				name := c.String("name")
 				desc := c.String("desc")
@@ -100,9 +114,13 @@ func publishCommand() *cli.Command {
 				return platform.Publish(platform.GitHub, name, desc, private)
 			}
 
-			publishPlatform, err := options.New("Publish platform", []string{"github", "codeberg"}).Run()
-			if err != nil {
-				return err
+			publishPlatform := platforms[0]
+			if len(platforms) > 1 {
+				var err error
+				publishPlatform, err = options.New("Publish platform", platforms).Run()
+				if err != nil {
+					return err
+				}
 			}
 
 			name, err := input.New(
